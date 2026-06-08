@@ -197,6 +197,23 @@ const MARKUP = `<!-- background -->
       <div class="edge l"></div><div class="edge r"></div>
     </div>
     <div class="stack-hint">↺ drag to spin · hover a logo for its name</div>
+
+    <div class="skill-cats reveal">
+      <div class="skill-cat spec"><div class="sc-key"><i>🤖</i> Agentic AI</div>
+        <div class="sc-chips"><span class="skill-chip">LangGraph</span><span class="skill-chip">LangChain</span><span class="skill-chip">CrewAI</span><span class="skill-chip">PraisonAI</span><span class="skill-chip">LiteLLM</span><span class="skill-chip">RAG</span><span class="skill-chip">Vector DBs</span></div></div>
+      <div class="skill-cat spec"><div class="sc-key"><i>🎙️</i> Voice AI</div>
+        <div class="sc-chips"><span class="skill-chip">LiveKit</span><span class="skill-chip">Vapi</span><span class="skill-chip">WebRTC</span><span class="skill-chip">Streaming STT / TTS</span></div></div>
+      <div class="skill-cat"><div class="sc-key"><i>🧠</i> LLMs / ML</div>
+        <div class="sc-chips"><span class="skill-chip">Azure OpenAI</span><span class="skill-chip">OpenAI</span><span class="skill-chip">Gemini</span><span class="skill-chip">GPT-4o</span><span class="skill-chip">Embeddings</span><span class="skill-chip">NLP</span></div></div>
+      <div class="skill-cat"><div class="sc-key"><i>⚙️</i> Backend</div>
+        <div class="sc-chips"><span class="skill-chip">Python</span><span class="skill-chip">Flask</span><span class="skill-chip">Node.js</span><span class="skill-chip">Express</span></div></div>
+      <div class="skill-cat"><div class="sc-key"><i>🗄️</i> Data</div>
+        <div class="sc-chips"><span class="skill-chip">PostgreSQL</span><span class="skill-chip">MongoDB</span><span class="skill-chip">Pinecone</span><span class="skill-chip">Redis</span></div></div>
+      <div class="skill-cat"><div class="sc-key"><i>☁️</i> Cloud & DevOps</div>
+        <div class="sc-chips"><span class="skill-chip">Docker</span><span class="skill-chip">AWS</span><span class="skill-chip">GCP</span><span class="skill-chip">Cloudflare R2</span></div></div>
+      <div class="skill-cat"><div class="sc-key"><i>💻</i> Languages</div>
+        <div class="sc-chips"><span class="skill-chip">Python</span><span class="skill-chip">C++</span><span class="skill-chip">JavaScript</span><span class="skill-chip">SQL</span><span class="skill-chip">C</span><span class="skill-chip">R</span></div></div>
+    </div>
   </section>
 
   <!-- CONTACT -->
@@ -224,7 +241,7 @@ const MARKUP = `<!-- background -->
         <div class="panel side-card">
           <div class="sc-label">Direct</div>
           <div class="copy-mail" id="copymail" data-hot>✉ hariharanjoga445@gmail.com <span id="copyhint">[ click to copy ]</span></div>
-          <a class="book-call" href="https://cal.com/" target="_blank" rel="noopener" data-hot><span>📅 Book a 15-min call</span><span>→</span></a>
+          <button type="button" class="book-call" data-cal-link="hariharan-joga/15min" data-cal-namespace="15min" data-cal-config='{"layout":"month_view","theme":"dark"}' data-hot><span>📅 Book a 15-min call</span><span>→</span></button>
         </div>
 
         <div class="panel side-card">
@@ -819,6 +836,46 @@ document.getElementById('copymail').addEventListener('click',function(){
     });
   }
 })();
+
+/* ---------- Cal.com embed — in-page booking popup (no redirect) ---------- */
+(function (C, A, L) {
+  let p = function (a, ar) { a.q.push(ar); };
+  let d = C.document;
+  C.Cal = C.Cal || function () {
+    let cal = C.Cal, ar = arguments;
+    if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; }
+    if (ar[0] === L) {
+      const api = function () { p(api, arguments); };
+      const namespace = ar[1];
+      api.q = api.q || [];
+      if (typeof namespace === "string") { cal.ns[namespace] = cal.ns[namespace] || api; p(cal.ns[namespace], ar); p(cal, ["initNamespace", namespace]); }
+      else p(cal, ar);
+      return;
+    }
+    p(cal, ar);
+  };
+})(window, "https://app.cal.com/embed/embed.js", "init");
+Cal("init", "15min", { origin: "https://cal.com" });
+Cal.ns["15min"]("ui", {
+  theme: "dark",
+  hideEventTypeDetails: false,
+  layout: "month_view",
+  cssVarsPerTheme: {
+    dark: {
+      "cal-brand": "#22e0ff",
+      "cal-bg": "#05070b",
+      "cal-bg-emphasis": "#0c121c",
+      "cal-bg-subtle": "#0a0f17",
+      "cal-bg-muted": "#0a0f17",
+      "cal-border": "rgba(0,229,255,0.18)",
+      "cal-border-emphasis": "rgba(0,229,255,0.28)",
+      "cal-border-subtle": "rgba(0,229,255,0.10)",
+      "cal-text": "#e8f3ff",
+      "cal-text-emphasis": "#ffffff",
+      "cal-text-muted": "#7d8da4"
+    }
+  }
+});
 
   }, []);
   return <div dangerouslySetInnerHTML={{ __html: MARKUP }} />;

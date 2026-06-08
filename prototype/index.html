@@ -355,6 +355,19 @@
   .stack-3d .edge.l{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
   .stack-3d .edge.r{right:0;background:linear-gradient(270deg,var(--bg),transparent)}
   .stack-hint{text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--muted-2);margin-top:10px;letter-spacing:.06em}
+  /* categorized skills — recruiter-scannable list under the carousel */
+  .skill-cats{max-width:940px;margin:50px auto 0;display:flex;flex-direction:column;gap:8px}
+  .skill-cat{display:grid;grid-template-columns:190px 1fr;gap:18px;align-items:center;padding:15px 18px;border:1px solid var(--line);border-radius:12px;background:var(--panel);transition:.25s}
+  .skill-cat:hover{border-color:var(--line-strong);background:rgba(34,224,255,0.045)}
+  .sc-key{font-family:var(--font-mono);font-size:13.5px;letter-spacing:.04em;color:var(--cyan);display:flex;align-items:center;gap:9px;white-space:nowrap}
+  .sc-key i{font-style:normal;font-size:16px}
+  .sc-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .skill-chip{font-family:var(--font-mono);font-size:12px;letter-spacing:.02em;padding:6px 12px;border-radius:8px;background:rgba(34,224,255,0.06);color:var(--text);border:1px solid var(--line);transition:.18s}
+  .skill-chip:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(34,224,255,0.12)}
+  .skill-cat.spec{border-color:rgba(176,107,255,0.28)}
+  .skill-cat.spec .sc-key{color:var(--violet)}
+  .skill-cat.spec .skill-chip:hover{border-color:var(--violet);color:var(--violet);background:rgba(176,107,255,0.12)}
+  @media(max-width:680px){.skill-cat{grid-template-columns:1fr;gap:9px}}
   @media(max-width:600px){.stack-3d{height:330px;perspective:1050px}.tech-card{width:96px;height:116px;left:-48px;top:-58px}}
 
   /* ---------- CONTACT (TRANSMISSION console) ---------- */
@@ -391,7 +404,7 @@
   .copy-mail:hover{background:rgba(34,224,255,0.07);border-style:solid}
   .copy-mail #copyhint{color:var(--muted-2);font-size:11px}
   .book-call{font-family:var(--font-mono);font-size:13px;border:1px solid var(--line-strong);border-radius:10px;
-    padding:12px 15px;display:flex;align-items:center;justify-content:space-between;color:var(--text);cursor:none;transition:.2s}
+    padding:12px 15px;display:flex;align-items:center;justify-content:space-between;color:var(--text);cursor:none;transition:.2s;background:transparent;width:100%;text-align:left}
   .book-call:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(34,224,255,0.07)}
   .socials{display:flex;flex-direction:column;gap:9px;font-family:var(--font-mono);font-size:13px}
   .socials a{color:var(--muted);transition:.2s;width:max-content}
@@ -728,6 +741,23 @@
       <div class="edge l"></div><div class="edge r"></div>
     </div>
     <div class="stack-hint">↺ drag to spin · hover a logo for its name</div>
+
+    <div class="skill-cats reveal">
+      <div class="skill-cat spec"><div class="sc-key"><i>🤖</i> Agentic AI</div>
+        <div class="sc-chips"><span class="skill-chip">LangGraph</span><span class="skill-chip">LangChain</span><span class="skill-chip">CrewAI</span><span class="skill-chip">PraisonAI</span><span class="skill-chip">LiteLLM</span><span class="skill-chip">RAG</span><span class="skill-chip">Vector DBs</span></div></div>
+      <div class="skill-cat spec"><div class="sc-key"><i>🎙️</i> Voice AI</div>
+        <div class="sc-chips"><span class="skill-chip">LiveKit</span><span class="skill-chip">Vapi</span><span class="skill-chip">WebRTC</span><span class="skill-chip">Streaming STT / TTS</span></div></div>
+      <div class="skill-cat"><div class="sc-key"><i>🧠</i> LLMs / ML</div>
+        <div class="sc-chips"><span class="skill-chip">Azure OpenAI</span><span class="skill-chip">OpenAI</span><span class="skill-chip">Gemini</span><span class="skill-chip">GPT-4o</span><span class="skill-chip">Embeddings</span><span class="skill-chip">NLP</span></div></div>
+      <div class="skill-cat"><div class="sc-key"><i>⚙️</i> Backend</div>
+        <div class="sc-chips"><span class="skill-chip">Python</span><span class="skill-chip">Flask</span><span class="skill-chip">Node.js</span><span class="skill-chip">Express</span></div></div>
+      <div class="skill-cat"><div class="sc-key"><i>🗄️</i> Data</div>
+        <div class="sc-chips"><span class="skill-chip">PostgreSQL</span><span class="skill-chip">MongoDB</span><span class="skill-chip">Pinecone</span><span class="skill-chip">Redis</span></div></div>
+      <div class="skill-cat"><div class="sc-key"><i>☁️</i> Cloud & DevOps</div>
+        <div class="sc-chips"><span class="skill-chip">Docker</span><span class="skill-chip">AWS</span><span class="skill-chip">GCP</span><span class="skill-chip">Cloudflare R2</span></div></div>
+      <div class="skill-cat"><div class="sc-key"><i>💻</i> Languages</div>
+        <div class="sc-chips"><span class="skill-chip">Python</span><span class="skill-chip">C++</span><span class="skill-chip">JavaScript</span><span class="skill-chip">SQL</span><span class="skill-chip">C</span><span class="skill-chip">R</span></div></div>
+    </div>
   </section>
 
   <!-- CONTACT -->
@@ -755,7 +785,7 @@
         <div class="panel side-card">
           <div class="sc-label">Direct</div>
           <div class="copy-mail" id="copymail" data-hot>✉ hariharanjoga445@gmail.com <span id="copyhint">[ click to copy ]</span></div>
-          <a class="book-call" href="https://cal.com/" target="_blank" rel="noopener" data-hot><span>📅 Book a 15-min call</span><span>→</span></a>
+          <button type="button" class="book-call" data-cal-link="hariharan-joga/15min" data-cal-namespace="15min" data-cal-config='{"layout":"month_view","theme":"dark"}' data-hot><span>📅 Book a 15-min call</span><span>→</span></button>
         </div>
 
         <div class="panel side-card">
@@ -1347,6 +1377,46 @@ document.getElementById('copymail').addEventListener('click',function(){
     });
   }
 })();
+
+/* ---------- Cal.com embed — in-page booking popup (no redirect) ---------- */
+(function (C, A, L) {
+  let p = function (a, ar) { a.q.push(ar); };
+  let d = C.document;
+  C.Cal = C.Cal || function () {
+    let cal = C.Cal, ar = arguments;
+    if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; }
+    if (ar[0] === L) {
+      const api = function () { p(api, arguments); };
+      const namespace = ar[1];
+      api.q = api.q || [];
+      if (typeof namespace === "string") { cal.ns[namespace] = cal.ns[namespace] || api; p(cal.ns[namespace], ar); p(cal, ["initNamespace", namespace]); }
+      else p(cal, ar);
+      return;
+    }
+    p(cal, ar);
+  };
+})(window, "https://app.cal.com/embed/embed.js", "init");
+Cal("init", "15min", { origin: "https://cal.com" });
+Cal.ns["15min"]("ui", {
+  theme: "dark",
+  hideEventTypeDetails: false,
+  layout: "month_view",
+  cssVarsPerTheme: {
+    dark: {
+      "cal-brand": "#22e0ff",
+      "cal-bg": "#05070b",
+      "cal-bg-emphasis": "#0c121c",
+      "cal-bg-subtle": "#0a0f17",
+      "cal-bg-muted": "#0a0f17",
+      "cal-border": "rgba(0,229,255,0.18)",
+      "cal-border-emphasis": "rgba(0,229,255,0.28)",
+      "cal-border-subtle": "rgba(0,229,255,0.10)",
+      "cal-text": "#e8f3ff",
+      "cal-text-emphasis": "#ffffff",
+      "cal-text-muted": "#7d8da4"
+    }
+  }
+});
 </script>
 </body>
 </html>
