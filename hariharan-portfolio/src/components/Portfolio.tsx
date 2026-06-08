@@ -134,7 +134,7 @@ const MARKUP = `<!-- background -->
       <a class="card reveal" href="https://github.com/Hariharanjoga" target="_blank" rel="noopener" data-hot><div class="topline"><span class="num">PRJ_03</span><span class="arrow">↗</span></div>
         <h3>Agentic AI Engine</h3><p>Low-latency, multi-turn conversational AI for live voice assistants — LangGraph state management + a grounded Azure OpenAI prompt pipeline.</p>
         <div class="tags"><span class="tag">LangGraph</span><span class="tag">CrewAI</span><span class="tag">Node.js</span></div></a>
-      <a class="card reveal" href="https://github.com/Hariharanjoga" target="_blank" rel="noopener" data-hot><div class="topline"><span class="num">PRJ_04</span><span class="arrow">↗</span></div>
+      <a class="card reveal" href="https://campuscortexai.software" target="_blank" rel="noopener" data-live="https://campuscortexai.software" data-title="Campus Cortex AI" data-hot><div class="topline"><span class="num">PRJ_04</span><span class="arrow">↗</span></div>
         <h3>Campus Cortex AI</h3><p>Multi-tenant edtech SaaS with Gemini multimodal grading + hallucination-free RAG tutoring; auto mock-tests and real-time handwritten-answer evaluation.</p>
         <div class="tags"><span class="tag">Gemini</span><span class="tag">RAG</span><span class="tag">React</span><span class="tag">MongoDB</span></div></a>
       <a class="card reveal" href="https://github.com/Hariharanjoga" target="_blank" rel="noopener" data-hot><div class="topline"><span class="num">PRJ_05</span><span class="arrow">↗</span></div>
@@ -275,7 +275,7 @@ const MARKUP = `<!-- background -->
     <div class="meta"><b>ASK HARIHARAN</b><small><i></i> NEURAL_LINK ONLINE</small></div>
     <div class="x" id="chat-close">✕</div>
   </div>
-  <div class="chat-tag">// grounded on my résumé + projects · 🎤 voice enabled · <b>powered by Claude</b></div>
+  <div class="chat-tag">// grounded on my résumé + projects · 🎤 voice enabled · <b>powered by NVIDIA</b></div>
   <div class="chat-body" id="chat-body"></div>
   <div class="chips" id="chat-chips"></div>
   <form class="chat-input" id="chat-form">
@@ -283,6 +283,23 @@ const MARKUP = `<!-- background -->
     <input id="chat-input" placeholder="Type your question…" autocomplete="off" />
     <button type="submit">➤</button>
   </form>
+</aside>
+
+<!-- live project preview -->
+<div id="live-scrim"></div>
+<aside id="live-modal" role="dialog" aria-modal="true" aria-label="Live project preview">
+  <div class="live-head">
+    <div class="live-dots"><span></span><span></span><span></span></div>
+    <div class="live-url"><span class="lock">🔒</span><span id="live-host">—</span><span class="live-badge"><i></i> LIVE</span></div>
+    <div class="live-actions">
+      <a class="live-act" id="live-open" href="#" target="_blank" rel="noopener" title="Open in new tab">↗</a>
+      <button type="button" class="live-act" id="live-close" title="Close">✕</button>
+    </div>
+  </div>
+  <div class="live-body">
+    <div class="live-loading" id="live-loading"><div class="boot-ring"></div><span>ESTABLISHING UPLINK…</span></div>
+    <iframe id="live-frame" title="Live site preview" referrerpolicy="no-referrer-when-downgrade" allow="clipboard-read; clipboard-write; fullscreen"></iframe>
+  </div>
 </aside>
 
 <!-- command palette -->
@@ -835,6 +852,36 @@ document.getElementById('copymail').addEventListener('click',function(){
       rr.appendChild(s);
     });
   }
+})();
+
+/* ---------- live project preview (in-page iframe of the deployed site) ---------- */
+(function(){
+  const scrim=document.getElementById('live-scrim'),modal=document.getElementById('live-modal'),
+        frame=document.getElementById('live-frame'),host=document.getElementById('live-host'),
+        openBtn=document.getElementById('live-open'),closeBtn=document.getElementById('live-close'),
+        loading=document.getElementById('live-loading');
+  if(!modal)return;
+  let open=false,fallbackT=null;
+  function show(url){
+    let h=url; try{h=new URL(url).host;}catch(_){}
+    host.textContent=h; openBtn.href=url;
+    loading.classList.remove('hide'); frame.classList.remove('ready');
+    frame.src=url;
+    scrim.classList.add('open'); modal.classList.add('open'); open=true; document.body.style.overflow='hidden';
+    clearTimeout(fallbackT); fallbackT=setTimeout(()=>{frame.classList.add('ready');loading.classList.add('hide');},9000);
+  }
+  function hide(){
+    open=false; clearTimeout(fallbackT);
+    scrim.classList.remove('open'); modal.classList.remove('open'); document.body.style.overflow='';
+    setTimeout(()=>{ if(!open)frame.src='about:blank'; },420);
+  }
+  frame.addEventListener('load',()=>{ if(frame.src&&frame.src.indexOf('about:blank')===-1){ frame.classList.add('ready'); loading.classList.add('hide'); } });
+  closeBtn.addEventListener('click',hide);
+  scrim.addEventListener('click',hide);
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&open)hide(); });
+  document.querySelectorAll('.card[data-live]').forEach(card=>{
+    card.addEventListener('click',e=>{ e.preventDefault(); show(card.getAttribute('data-live')); });
+  });
 })();
 
 /* ---------- Cal.com embed — in-page booking popup (no redirect) ---------- */
