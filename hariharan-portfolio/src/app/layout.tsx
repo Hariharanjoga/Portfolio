@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Hariharan Joga — Agentic & Voice AI Engineer",
+  title: "Hariharan Joga — Agentic, Generative & Voice AI Engineer",
   description:
-    "Hariharan Joga — AI engineer building agentic systems and real-time voice AI. Ask my AI anything about me — it talks back.",
+    "Hariharan Joga — AI engineer building agentic & generative AI: multi-agent architectures, LLM systems, and voice & chat agents. Ask my AI anything about me — it talks back.",
   openGraph: {
-    title: "Hariharan Joga — Agentic & Voice AI Engineer",
+    title: "Hariharan Joga — Agentic, Generative & Voice AI Engineer",
     description:
-      "AI engineer building agentic systems and real-time voice AI. Ask my AI anything — it talks back.",
+      "AI engineer building agentic & generative AI — multi-agent architectures, LLM systems, voice & chat agents. Ask my AI anything — it talks back.",
     type: "website",
   },
 };

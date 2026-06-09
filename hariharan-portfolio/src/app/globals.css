@@ -145,7 +145,7 @@
   @keyframes blink{50%{opacity:0}}
   h1{font-family:var(--font-display);font-weight:700;font-size:clamp(44px,8vw,92px);line-height:.95;
     letter-spacing:-.02em;margin-bottom:10px}
-  h1 .glitch{position:relative;display:inline-block;
+  h1 .glitch{position:relative;display:inline-block;vertical-align:top;
     background:linear-gradient(90deg,#fff 0%,var(--cyan) 60%,var(--violet) 100%);
     -webkit-background-clip:text;background-clip:text;color:transparent}
   .role{font-family:var(--font-mono);font-size:clamp(15px,2vw,21px);color:var(--muted);margin-bottom:8px;
@@ -464,6 +464,10 @@
     animation:ring 2s ease-out infinite}
   @keyframes ring{0%{transform:scale(.8);opacity:.8}100%{transform:scale(1.5);opacity:0}}
   @media(max-width:560px){.ask-fab span{display:none}.ask-fab{padding:14px;border-radius:50%}}
+
+  /* ---------- AI-guided focus highlight ---------- */
+  .ai-focus{animation:aiFocus 2.6s cubic-bezier(.2,.7,.2,1)}
+  @keyframes aiFocus{0%{box-shadow:0 0 0 0 rgba(34,224,255,0)}12%{box-shadow:0 0 0 2px var(--cyan),0 0 38px rgba(34,224,255,.45)}100%{box-shadow:0 0 0 0 rgba(34,224,255,0)}}
 
   /* ---------- live project preview ---------- */
   #live-scrim{position:fixed;inset:0;background:rgba(2,6,12,0.72);backdrop-filter:blur(7px) saturate(1.1);opacity:0;pointer-events:none;transition:opacity .35s;z-index:90}

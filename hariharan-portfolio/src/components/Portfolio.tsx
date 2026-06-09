@@ -45,10 +45,10 @@ const MARKUP = `<!-- background -->
   <!-- HERO -->
   <section id="hero">
     <div>
-      <div class="hero-tag"><span class="blink"></span> SYSTEM ONLINE · AGENTIC + VOICE AI</div>
-      <h1>I build AI that<br><span class="glitch">talks back</span>.</h1>
+      <div class="hero-tag"><span class="blink"></span> SYSTEM ONLINE · AGENTIC · GENERATIVE · VOICE AI</div>
+      <h1>I build AI that<br><span class="glitch">thinks &amp; talks back.</span></h1>
       <p class="role">> <b>Hariharan Joga</b> · <span class="typed" id="typed"></span></p>
-      <p class="lede">AI engineer building agentic systems and real-time voice AI — multi-agent pipelines and sub-second voice agents that ship to production. Currently building agentic AI at Excelerate Technologies.</p>
+      <p class="lede">AI engineer building agentic &amp; generative AI — multi-agent architectures, voice &amp; chat agents, and LLM systems that ship to production. Currently building agentic AI at Excelerate Technologies.</p>
       <div class="cta-row">
         <a href="#projects" class="btn primary" data-hot>▸ View Work</a>
         <button type="button" class="btn talk" id="talk-cta" data-hot>🎤 Talk to my AI</button>
@@ -56,7 +56,7 @@ const MARKUP = `<!-- background -->
       </div>
 
       <div class="stat-row">
-        <div class="stat"><div class="num">5<span>+</span></div><div class="lbl">Years building</div></div>
+        <div class="stat"><div class="num">3<span>+</span></div><div class="lbl">Years building</div></div>
         <div class="stat"><div class="num">20<span>+</span></div><div class="lbl">Shipped projects</div></div>
         <div class="stat"><div class="num">40<span>%</span></div><div class="lbl">Latency cut</div></div>
       </div>
@@ -97,14 +97,14 @@ const MARKUP = `<!-- background -->
   <!-- ABOUT -->
   <section id="about">
     <div class="eyebrow"><span class="idx">01</span> // whoami</div>
-    <h2 class="section-title reveal">Engineer of agents & voice AI.</h2>
+    <h2 class="section-title reveal">Engineer of agentic, generative & voice AI.</h2>
     <div class="about-grid">
       <div class="panel reveal">
         <div class="term-line"><span class="pmt">hari@deck:~$</span> cat about.md</div>
         <p style="color:#b9c4d4;font-size:15px">
-          I'm Hariharan Joga — an AI engineer who lives at the frontier of agentic systems and
-          real-time voice AI. I build autonomous multi-agent pipelines (LangGraph, CrewAI, LangChain)
-          and sub-second voice agents (LiveKit, WebRTC) that actually run in production — not just notebooks.
+          I'm Hariharan Joga — an AI engineer who lives at the frontier of agentic, generative, and
+          real-time voice AI. I design autonomous multi-agent architectures (LangGraph, CrewAI, PraisonAI),
+          generative-AI products, and sub-second voice &amp; chat agents (LiveKit, Twilio) that actually run in production — not just notebooks.
         </p>
         <p style="color:#8c98aa;font-size:14px;margin-top:14px">
           From Bhumi — a multilingual farming voice assistant answering over normal phone calls — to an
@@ -113,8 +113,8 @@ const MARKUP = `<!-- background -->
         </p>
       </div>
       <div class="pillars">
-        <div class="pillar reveal"><h4><i>◧</i> Agentic AI</h4><p>Multi-agent orchestration with LangGraph, CrewAI & LangChain — systems that plan, act, and ship autonomously.</p></div>
-        <div class="pillar reveal"><h4><i>◨</i> Real-Time Voice AI</h4><p>Sub-second voice agents (LiveKit, WebRTC) with semantic caching — natural conversation over real phone calls.</p></div>
+        <div class="pillar reveal"><h4><i>◧</i> Agentic & Multi-Agent</h4><p>Multi-agent architectures with LangGraph, CrewAI & PraisonAI — planner / researcher / writer / QA crews that plan, act, and ship autonomously.</p></div>
+        <div class="pillar reveal"><h4><i>◨</i> Generative & Voice AI</h4><p>Generative-AI products plus sub-second voice & WhatsApp agents (LiveKit, Twilio) — natural conversation over calls and chat.</p></div>
         <div class="pillar reveal"><h4><i>◩</i> Backend & Infra</h4><p>Polyglot backends — Python/Flask, Node, Postgres, Pinecone, Redis, Docker, AWS/GCP, async pipelines.</p></div>
       </div>
     </div>
@@ -129,20 +129,20 @@ const MARKUP = `<!-- background -->
         <h3>Bhumi</h3><p>Sub-800ms multilingual voice AI for farmers — crop troubleshooting & fertilizer dosage over a normal phone call, with Redis semantic caching to skip vector lookups.</p>
         <div class="tags"><span class="tag">LiveKit</span><span class="tag">WebRTC</span><span class="tag">Azure OpenAI</span><span class="tag">Redis</span></div></a>
       <a class="card reveal" href="https://github.com/Hariharanjoga" target="_blank" rel="noopener" data-hot><div class="topline"><span class="num">PRJ_02</span><span class="arrow">↗</span></div>
-        <h3>AI CMO</h3><p>Autonomous multi-agent marketing officer (Researcher · Writer · QA) that researches B2B rivals on the live web and streams its "thinking" to the UI via SSE.</p>
-        <div class="tags"><span class="tag">PraisonAI</span><span class="tag">Multi-Agent</span><span class="tag">Flask</span><span class="tag">SSE</span></div></a>
-      <a class="card reveal" href="https://github.com/Hariharanjoga" target="_blank" rel="noopener" data-hot><div class="topline"><span class="num">PRJ_03</span><span class="arrow">↗</span></div>
-        <h3>Agentic AI Engine</h3><p>Low-latency, multi-turn conversational AI for live voice assistants — LangGraph state management + a grounded Azure OpenAI prompt pipeline.</p>
-        <div class="tags"><span class="tag">LangGraph</span><span class="tag">CrewAI</span><span class="tag">Node.js</span></div></a>
-      <a class="card reveal" href="https://campuscortexai.software" target="_blank" rel="noopener" data-live="https://campuscortexai.software" data-title="Campus Cortex AI" data-hot><div class="topline"><span class="num">PRJ_04</span><span class="arrow">↗</span></div>
+        <h3>Agentic AI Engine</h3><p>Low-latency, multi-turn conversational AI powering both live voice assistants and WhatsApp chatbots (Twilio) — LangGraph state management + a grounded Azure OpenAI prompt pipeline.</p>
+        <div class="tags"><span class="tag">LangGraph</span><span class="tag">Twilio</span><span class="tag">WhatsApp</span><span class="tag">Azure OpenAI</span></div></a>
+      <a class="card reveal" href="https://campuscortexai.software" target="_blank" rel="noopener" data-live="https://campuscortexai.software" data-title="Campus Cortex AI" data-hot><div class="topline"><span class="num">PRJ_03</span><span class="arrow">↗</span></div>
         <h3>Campus Cortex AI</h3><p>Multi-tenant edtech SaaS with Gemini multimodal grading + hallucination-free RAG tutoring; auto mock-tests and real-time handwritten-answer evaluation.</p>
         <div class="tags"><span class="tag">Gemini</span><span class="tag">RAG</span><span class="tag">React</span><span class="tag">MongoDB</span></div></a>
+      <a class="card reveal" href="https://github.com/Hariharanjoga" target="_blank" rel="noopener" data-hot><div class="topline"><span class="num">PRJ_04</span><span class="arrow">↗</span></div>
+        <h3>AI CMO</h3><p>Autonomous multi-agent marketing officer (Researcher · Writer · QA) that researches B2B rivals on the live web and streams its "thinking" to the UI via SSE.</p>
+        <div class="tags"><span class="tag">PraisonAI</span><span class="tag">Multi-Agent</span><span class="tag">Flask</span><span class="tag">SSE</span></div></a>
       <a class="card reveal" href="https://github.com/Hariharanjoga" target="_blank" rel="noopener" data-hot><div class="topline"><span class="num">PRJ_05</span><span class="arrow">↗</span></div>
+        <h3>Edu Tech AI</h3><p>Generative-AI study app (GPT-4 Turbo + Gemini) that lifted user interaction 40% — auto-generates mock tests and evaluates handwritten answers in real time.</p>
+        <div class="tags"><span class="tag">GPT-4 Turbo</span><span class="tag">Gemini</span><span class="tag">React</span><span class="tag">MongoDB</span></div></a>
+      <a class="card reveal" href="https://github.com/Hariharanjoga" target="_blank" rel="noopener" data-hot><div class="topline"><span class="num">PRJ_06</span><span class="arrow">↗</span></div>
         <h3>Financial Risk Analyzer</h3><p>Summarizes SEC filings & compliance docs and scores document/portfolio risk with GPT-4 Turbo + text-embedding-3 retrieval.</p>
         <div class="tags"><span class="tag">RAG</span><span class="tag">Flask</span><span class="tag">OpenAI</span></div></a>
-      <a class="card reveal" href="https://github.com/Hariharanjoga" target="_blank" rel="noopener" data-hot><div class="topline"><span class="num">PRJ_06</span><span class="arrow">↗</span></div>
-        <h3>Fraud Detection Engine</h3><p>Random-Forest fraud detector at 98% accuracy with batch + single-record pipelines, boosting detection efficiency 35%.</p>
-        <div class="tags"><span class="tag">ML</span><span class="tag">Random Forest</span><span class="tag">Python</span></div></a>
     </div>
   </section>
 
@@ -155,9 +155,9 @@ const MARKUP = `<!-- background -->
         <div class="tl-item reveal" data-role="AI SDE Intern" data-org="Excelerate Technologies" data-when="Feb 2026 — Present" data-tech="LangGraph,LangChain,CrewAI,LiveKit"><div class="when">FEB 2026 — PRESENT</div><h4>AI SDE Intern</h4>
           <div class="org">Excelerate Technologies</div>
           <p>Building agentic AI with LangGraph, LangChain & CrewAI for autonomous task orchestration; deploying custom LLMs with real-time LiveKit voice to production.</p></div>
-        <div class="tl-item reveal" data-role="Founding AI Engineer" data-org="Campus Cortex AI" data-when="Jun 2025 — Jan 2026" data-tech="PostgreSQL,Pinecone,Gemini,Docker"><div class="when">JUN 2025 — JAN 2026</div><h4>Founding AI Engineer</h4>
+        <div class="tl-item reveal" data-role="Founding AI Engineer" data-org="Campus Cortex AI" data-when="Jun 2025 — Jan 2026" data-tech="PostgreSQL,Pinecone,Gemini,Twilio,WhatsApp"><div class="when">JUN 2025 — JAN 2026</div><h4>Founding AI Engineer</h4>
           <div class="org">Campus Cortex AI</div>
-          <p>Architected a multi-tenant SaaS on a polyglot backend (Postgres, Pinecone, Mongo) with Gemini multimodal grading + hallucination-free RAG tutoring and async pipelines (Docker, Cloudflare R2).</p></div>
+          <p>Architected a multi-tenant SaaS on a polyglot backend (Postgres, Pinecone, Mongo) with Gemini multimodal grading + hallucination-free RAG tutoring; built multi-turn WhatsApp conversational AI via Twilio; orchestrated async pipelines (Docker, Cloudflare R2).</p></div>
         <div class="tl-item reveal" data-role="SDE Intern · Founding Engineer" data-org="Soven Developer" data-when="Dec 2024 — Mar 2025" data-tech="OpenAI,Azure,Flask,GPT-4o"><div class="when">DEC 2024 — MAR 2025</div><h4>SDE Intern · Founding Engineer</h4>
           <div class="org">Soven Developer</div>
           <p>Built Generative AI on OpenAI & Azure OpenAI; architected a Flask backend and integrated GPT-4o Vision, cutting processing latency 35%.</p></div>
@@ -170,7 +170,7 @@ const MARKUP = `<!-- background -->
         <div class="head"><span>CAREER // SUMMARY</span><span class="id">// 2018 →</span></div>
         <div class="exp-stats">
           <div class="stat-tile"><div class="n" data-to="20" data-suf="+">0</div><div class="l">Projects shipped</div></div>
-          <div class="stat-tile"><div class="n" data-to="5" data-suf="+">0</div><div class="l">Years building</div></div>
+          <div class="stat-tile"><div class="n" data-to="3" data-suf="+">0</div><div class="l">Years building</div></div>
           <div class="stat-tile"><div class="n" data-to="50" data-suf="k+">0</div><div class="l">Users reached</div></div>
           <div class="stat-tile"><div class="n" data-to="40" data-suf="%">0</div><div class="l">Latency cut</div></div>
         </div>
@@ -335,7 +335,7 @@ setInterval(()=>{
 /* ---------- typed role ---------- */
 (function(){
   const el=document.getElementById('typed');
-  const words=['Agentic AI','Voice AI','LangGraph & CrewAI','RAG Systems','LLM Engineering'];
+  const words=['Multi-Agent Systems','Generative AI','Voice AI','LangGraph & CrewAI','RAG Pipelines'];
   let w=0,c=0,del=false;
   (function tick(){
     const word=words[w];
@@ -513,24 +513,53 @@ document.getElementById('copymail').addEventListener('click',function(){
     suggestions.forEach(s=>{const c=document.createElement('button');c.type='button';c.className='chip-q';c.textContent=s;
       c.onclick=()=>send(s);chips.appendChild(c);});
   }
+  // AI-guided navigation: scroll to + pulse the section/project the answer is about
+  function doFocus(id){
+    if(!id||id==='none')return;
+    const sec={about:'#about',projects:'#projects',experience:'#experience',skills:'#stack',contact:'#contact'};
+    const proj={bhumi:'Bhumi','agentic-engine':'Agentic AI Engine','campus-cortex':'Campus Cortex AI','ai-cmo':'AI CMO','edu-tech':'Edu Tech AI',financial:'Financial Risk Analyzer'};
+    let el=null,block='start';
+    if(sec[id])el=document.querySelector(sec[id]);
+    else if(proj[id]){ el=[].slice.call(document.querySelectorAll('#projects .card')).find(c=>{const h=c.querySelector('h3');return h&&h.textContent.trim()===proj[id];}); block='center'; }
+    if(!el)return;
+    try{el.scrollIntoView({behavior:'smooth',block:block});}catch(_){el.scrollIntoView();}
+    el.classList.remove('ai-focus'); void el.offsetWidth; el.classList.add('ai-focus');
+    setTimeout(()=>el.classList.remove('ai-focus'),2700);
+  }
+  function focusFromText(q){
+    q=(q||'').toLowerCase();
+    if(/bhumi|\bvoice\b|strongest|best project|proudest|favou?rite|phone call|farmer/.test(q))return'bhumi';
+    if(/\bcmo\b|marketing|multi-?agent|researcher|agent crew/.test(q))return'ai-cmo';
+    if(/whatsapp|twilio|chatbot|conversational/.test(q))return'agentic-engine';
+    if(/campus|cortex|edtech|tutor|grading/.test(q))return'campus-cortex';
+    if(/edu ?tech|study app|mock test|handwritten/.test(q))return'edu-tech';
+    if(/financ|\bsec\b|risk|compliance|filing|\bdocument/.test(q))return'financial';
+    if(/experience|\brole\b|career|intern|\bjob\b|worked|excelerate|soven|infosys/.test(q))return'experience';
+    if(/skill|stack|\btech\b|language|tool|framework|proficien/.test(q))return'skills';
+    if(/contact|email|reach|\bhire\b|connect|availab|book|call|r[ée]sum[ée]|resume|linkedin|github/.test(q))return'contact';
+    if(/project|built|portfolio|shipped|\bwork\b/.test(q))return'projects';
+    return null;
+  }
   function send(text,opts){
     if(!text.trim())return;
     bargeIn();                                  // cancel any in-flight turn + stop all audio (no overlap, ever)
     const myGen=genId; busy=true; chips.innerHTML='';
     addMsg('me',text).textContent=text;
+    try{ const f=focusFromText(text); if(f)doFocus(f); }catch(_){}   // AI-guided nav: scroll the instant the question is asked (no model wait)
     const prior=history.slice();history.push({role:'user',content:text});
     const willSpeak=!!(voiceOn||(opts&&opts.spoken));
     const ctrl=new AbortController(); currentAbort=ctrl;
     const t=typingBubble();
     let bubble=null,acc='',spokenUpto=0;
     const ensure=()=>{ if(!bubble){t.remove();bubble=addMsg('bot','');} return bubble; };
+    const sayClean=s=>s.replace(/\[(.*?)\]\([^)]*\)/g,'$1').replace(/[*_`#>]/g,'').replace(/^\s*[-•]\s+/gm,'').trim(); // don't read markdown aloud
     // speak complete sentences as they stream → voice starts on sentence 1, not the whole answer
     function flushSpeech(final){
       if(!willSpeak||myGen!==genId)return;
       let lastB=-1;
       for(let j=spokenUpto;j<acc.length;j++){const c=acc[j];if(c==='.'||c==='!'||c==='?'||c==='\n')lastB=j;}
-      if(lastB>=spokenUpto){ const chunk=acc.slice(spokenUpto,lastB+1).trim(); if(chunk.length>1)speakChunk(chunk,myGen); spokenUpto=lastB+1; }
-      if(final){ const tail=acc.slice(spokenUpto).trim(); if(tail.length>1)speakChunk(tail,myGen); spokenUpto=acc.length; }
+      if(lastB>=spokenUpto){ const chunk=sayClean(acc.slice(spokenUpto,lastB+1)); if(chunk.length>1)speakChunk(chunk,myGen); spokenUpto=lastB+1; }
+      if(final){ const tail=sayClean(acc.slice(spokenUpto)); if(tail.length>1)speakChunk(tail,myGen); spokenUpto=acc.length; }
     }
     // No canned answers — if the model can't be reached, show an honest error (never fake facts).
     const fallback=()=>{ if(myGen!==genId)return; const b=ensure();
@@ -633,33 +662,40 @@ document.getElementById('copymail').addEventListener('click',function(){
   }
   const PCM_FMT={8000:'pcm_8000',16000:'pcm_16000',22050:'pcm_22050',24000:'pcm_24000',44100:'pcm_44100',48000:'pcm_48000'};
   function toB64(bytes){ let s='',CH=0x8000; for(let i=0;i<bytes.length;i+=CH)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH)); return btoa(s); }
+  // The STT socket idle-closes during every bot reply / silent pause. A reconnect that re-mints a
+  // single-use token + re-handshakes is slow (~2-6s) — a dead window where the next question is LOST.
+  // Fix: keep a "warm" pre-minted token ready, so reconnects are near-instant and no question is dropped.
+  let warmTokenP=null;
+  function freshTokenP(){ return fetch('/api/stt-token').then(r=>r.ok?r.json():null).then(j=>(j&&j.token)||null).catch(()=>null); }
+  function prefetchToken(){ if(!warmTokenP)warmTokenP=freshTokenP(); }
   function openSTTSocket(){
-    fetch('/api/stt-token').then(r=>r.ok?r.json():null).then(j=>{
-      const token=j&&j.token;
+    const tp=warmTokenP||freshTokenP(); warmTokenP=null;            // consume the pre-minted token if we have one
+    tp.then(token=>{
       if(!convo)return;
-      if(!token){ console.warn('[voice] no STT token'); if(input)input.placeholder='Voice unavailable — tap mic to retry'; return; }
+      if(!token){ if(wsTries++<4){ setTimeout(openSTTSocket,200); } else if(input){ input.placeholder='Voice unavailable — tap mic to retry'; } return; }
       const fmt=PCM_FMT[convoSR]||'pcm_16000';
       const url='wss://api.elevenlabs.io/v1/speech-to-text/realtime?model_id=scribe_v2_realtime&audio_format='+fmt
         +'&commit_strategy=vad&vad_silence_threshold_secs=0.6&vad_threshold=0.5&min_speech_duration_ms=250&token='+encodeURIComponent(token);
       const ws=new WebSocket(url); convoWS=ws;
-      ws.onopen=()=>{ wsTries=0; console.log('[voice] STT socket open ('+fmt+')'); };
+      ws.onopen=()=>{ wsTries=0; prefetchToken(); console.log('[voice] STT socket open ('+fmt+')'); };   // pre-mint the next token now
       ws.onmessage=(ev)=>{ let m; try{m=JSON.parse(ev.data);}catch(_){return;}
         if(m.message_type==='committed_transcript'||m.message_type==='committed_transcript_with_timestamps'){
           const q=(m.text||'').trim(); console.log('[voice] transcript:',q);
-          if(q&&convo&&q.replace(/[^a-zA-Z0-9]/g,'').length>=2){ send(q,{spoken:true}); }
+          if(q&&convo&&q.replace(/[\s\p{P}\p{S}]/gu,'').length>=2){ send(q,{spoken:true}); prefetchToken(); } // reply coming → socket will idle-close → keep a token ready
         } };
       ws.onerror=()=>{ console.warn('[voice] STT socket error'); };
       ws.onclose=(e)=>{ console.log('[voice] STT socket closed',e&&e.code); if(ws!==convoWS)return; convoWS=null;
-        if(convo){ if(wsTries++<4){ setTimeout(openSTTSocket,500); } else { if(input)input.placeholder='Voice dropped — tap mic to retry'; stopConvo(); } } };
-    }).catch((err)=>{ console.warn('[voice] token fetch failed',err); if(convo&&wsTries++<4)setTimeout(openSTTSocket,700); });
+        if(convo){ if(wsTries++<4){ setTimeout(openSTTSocket,150); } else { if(input)input.placeholder='Voice dropped — tap mic to retry'; stopConvo(); } } };
+    });
   }
   async function startConvo(){
-    if(convo||!canRecord)return;
+    if(convo||!canRecord)return false;
     try{ convoStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}); }
-    catch(_){ if(input){input.placeholder='Mic blocked — allow access';setTimeout(()=>setMic('off'),2600);} return; }
+    catch(_){ if(input){input.placeholder='Mic blocked — allow access';setTimeout(()=>setMic('off'),2600);} return false; }
     const AC=window.AudioContext||window.webkitAudioContext;
-    convoCtx=new AC({sampleRate:16000});
-    try{ if(convoCtx.state==='suspended')await convoCtx.resume(); }catch(_){}
+    try{ convoCtx=new AC({sampleRate:16000}); }catch(_){ try{convoCtx=new AC();}catch(__){ if(input)input.placeholder='Audio unavailable'; return false; } }
+    try{ await convoCtx.resume(); }catch(_){}
+    if(convoCtx.state!=='running'){ const rsm=()=>{ try{convoCtx&&convoCtx.resume();}catch(_){}}; document.addEventListener('pointerdown',rsm,{once:true}); } // safety: resume on next tap if still suspended
     convoSR=convoCtx.sampleRate;
     console.log('[voice] convo start · ctx',convoCtx.state,'· sr',convoSR);
     convo=true; wsTries=0; setMic('listen');
@@ -692,6 +728,7 @@ document.getElementById('copymail').addEventListener('click',function(){
       convoWS.send(JSON.stringify({message_type:'input_audio_chunk',audio_base_64:toB64(new Uint8Array(pcm.buffer)),sample_rate:convoSR}));
     };
     openSTTSocket();
+    return true;
   }
   function stopConvo(){
     convo=false; wsTries=99;
@@ -715,10 +752,11 @@ document.getElementById('copymail').addEventListener('click',function(){
     b.addEventListener('mouseleave',()=>cur&&cur.classList.remove('hot'));
   });
 
-  // voice entry points — talk straight from the landing page (open chat, then start recording)
-  // open chat (greeting plays) AND start listening immediately — the conversation does not
-  // depend on the greeting's 'ended' event (that was unreliable). While the greeting plays we
-  // send keepalive silence, so it's neither transcribed nor cut off.
+  // voice entry points — talk straight from the landing page.
+  // ORDER MATTERS: greet on the CLICK gesture (synchronously) so the audio is unlocked instantly
+  // and stays unlocked for the whole session (this "media engagement" is what lets later reply TTS
+  // play without a fresh click). The mic permission is requested in PARALLEL — when granted it
+  // listens; while the greeting plays we stream keepalive silence so it's neither cut nor transcribed.
   function voiceStart(){ openChat(); if(canRecord)startConvo(); }
   const heroMic=document.getElementById('askpanel-mic'),talkCta=document.getElementById('talk-cta');
   if(heroMic){ if(canRecord)heroMic.addEventListener('click',voiceStart); else heroMic.style.display='none'; }
