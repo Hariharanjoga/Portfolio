@@ -477,7 +477,7 @@ document.getElementById('copymail').addEventListener('click',function(){
   const chat=document.getElementById('chat'),scrim=document.getElementById('chat-scrim'),
         body=document.getElementById('chat-body'),chips=document.getElementById('chat-chips'),
         form=document.getElementById('chat-form'),input=document.getElementById('chat-input');
-  let greeted=false,busy=false,voiceOn=false,history=[],genId=0,currentAbort=null;
+  let greeted=false,busy=false,voiceOn=false,history=[],genId=0,currentAbort=null,pendingFit=false;
 
   const suggestions=[
     "What's his strongest project?",
@@ -510,8 +510,44 @@ document.getElementById('copymail').addEventListener('click',function(){
   }
   function renderChips(){
     chips.innerHTML='';
+    const tog=document.createElement('button');tog.type='button';tog.className='chips-toggle';
+    tog.innerHTML='<span>✦ Suggested questions</span><span class="chev">⌄</span>';
+    const wrap=document.createElement('div');wrap.className='chips-wrap';
+    const fc=document.createElement('button');fc.type='button';fc.className='chip-q';fc.textContent='📋 Am I a fit for your role?';
+    fc.onclick=startFitCheck;wrap.appendChild(fc);                                   // JD fit-check entry point
     suggestions.forEach(s=>{const c=document.createElement('button');c.type='button';c.className='chip-q';c.textContent=s;
-      c.onclick=()=>send(s);chips.appendChild(c);});
+      c.onclick=()=>send(s);wrap.appendChild(c);});
+    tog.onclick=()=>{ const open=wrap.classList.toggle('open'); tog.classList.toggle('open',open); if(open)setTimeout(()=>{body.scrollTop=body.scrollHeight;},130); };
+    chips.appendChild(tog);chips.appendChild(wrap);                                  // collapsed by default; click pill to expand, auto-collapses on next reply
+  }
+  // recruiter pastes a job title/description → the chat returns an honest fit read (see /api/chat mode:'fit')
+  function looksLikeJD(t){ t=(t||''); return t.length>180 || /responsibilit|requirement|qualificat|we['’]?re looking for|we are looking for|job descript|about the role|nice to have|must[- ]have/i.test(t); }
+  function startFitCheck(){
+    pendingFit=true;
+    addMsg('bot','').textContent="Sure — paste the role's title or job description and I'll give you an honest fit read.";
+    if(input){ input.placeholder='Paste the job title or description…'; input.focus(); }
+    body.scrollTop=body.scrollHeight;
+  }
+  // turn the model's fit text (verdict + ✓/~ items) into a clean, scannable card — even if it ran them inline
+  function formatFit(t){
+    const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const clean=s=>esc((s||'').replace(/\s+/g,' ').trim());
+    t=(t||'').replace(/\r/g,'');
+    const firstM=t.search(/[✓~]/);
+    let head=firstM>=0?t.slice(0,firstM):t, rest=firstM>=0?t.slice(firstM):'';
+    let footer='';
+    const rm=rest.search(/reach him/i); if(rm>=0){ footer=rest.slice(rm); rest=rest.slice(0,rm); }
+    const items=[]; const re=/([✓~])\s*([^✓~]+)/g; let m;
+    while((m=re.exec(rest))) items.push([m[1]==='✓', m[2]]);
+    const lvl=/strong fit/i.test(head)?'strong':/partial/i.test(head)?'partial':/not a/i.test(head)?'no':'';
+    let html='';
+    if(head.trim()) html+='<div class="fit-verdict '+lvl+'">'+clean(head)+'</div>';
+    if(items.length){ html+='<div class="fit-list">';
+      for(const it of items){ const d=it[1].match(/^(.*?)\s+[—–-]\s+([\s\S]*)$/); const req=d?d[1]:it[1], desc=d?d[2]:'';  // split only on a spaced dash, so "Multi-agent" stays intact
+        html+='<div class="fit-row '+(it[0]?'ok':'gap')+'"><span class="fit-ic">'+(it[0]?'✓':'~')+'</span><span><b>'+clean(req)+'</b>'+(desc.trim()?' — '+clean(desc):'')+'</span></div>'; }
+      html+='</div>'; }
+    if(items.length) html+='<div class="fit-foot">Reach him → hariharanjoga445@gmail.com</div>';  // always show the contact CTA
+    return html||clean(t);
   }
   // AI-guided navigation: scroll to + pulse the section/project the answer is about
   function doFocus(id){
@@ -542,10 +578,13 @@ document.getElementById('copymail').addEventListener('click',function(){
   }
   function send(text,opts){
     if(!text.trim())return;
+    opts=opts||{};
+    const fit=!!(opts.fit||pendingFit||looksLikeJD(text)); pendingFit=false;   // JD fit-check: chip-triggered, flagged, or auto-detected paste
+    if(fit&&input&&!convo)input.placeholder='Type your question…';
     bargeIn();                                  // cancel any in-flight turn + stop all audio (no overlap, ever)
     const myGen=genId; busy=true; chips.innerHTML='';
     addMsg('me',text).textContent=text;
-    try{ const f=focusFromText(text); if(f)doFocus(f); }catch(_){}   // AI-guided nav: scroll the instant the question is asked (no model wait)
+    try{ const f=fit?'skills':focusFromText(text); if(f)doFocus(f); }catch(_){}   // fit → show his stack; else scroll to the relevant section
     const prior=history.slice();history.push({role:'user',content:text});
     const willSpeak=!!(voiceOn||(opts&&opts.spoken));
     const ctrl=new AbortController(); currentAbort=ctrl;
@@ -566,10 +605,11 @@ document.getElementById('copymail').addEventListener('click',function(){
       b.innerHTML="⚠ I couldn't reach my AI just now — please try again in a moment, or email <b>hariharanjoga445@gmail.com</b>.";
       busy=false;renderChips(); };
     const finishLive=()=>{ if(myGen!==genId)return; busy=false;renderChips();const said=acc.trim();
+      if(fit)ensure().innerHTML=formatFit(acc);                                      // final formatted fit card
       history.push({role:'assistant',content:said}); flushSpeech(true); };
     // stream the live answer from the NVIDIA-backed /api/chat, word-by-word as it's generated
     fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({question:text,history:prior}),signal:ctrl.signal})
+        body:JSON.stringify({question:text,history:prior,mode:fit?'fit':undefined}),signal:ctrl.signal})
       .then(r=>{
         if(!r.ok||!r.body) throw 0;
         const reader=r.body.getReader(),dec=new TextDecoder();
@@ -577,8 +617,8 @@ document.getElementById('copymail').addEventListener('click',function(){
           if(myGen!==genId)return;                 // superseded by a newer question → stop silently
           if(res.done){ acc.trim()?finishLive():fallback(); return; }
           acc+=dec.decode(res.value,{stream:true});
-          ensure().textContent=acc; body.scrollTop=body.scrollHeight;
-          flushSpeech(false);
+          if(fit)ensure().innerHTML=formatFit(acc);else ensure().textContent=acc;   // fit → formatted card, else plain streaming
+          body.scrollTop=body.scrollHeight; flushSpeech(false);
           pump();
         }).catch(function(){ if(myGen!==genId)return; acc.trim()?finishLive():fallback(); }); })();
       })

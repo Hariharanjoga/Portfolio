@@ -18,6 +18,20 @@ Rules:
 === HARIHARAN PROFILE ===
 ${PROFILE}`;
 
+// Fit-check mode: the user pastes a job title or description; map it to his real evidence.
+const FIT_SYSTEM = `You assess whether Hariharan Joga fits a role. The user's message is a job title or job description.
+
+Reply in plain text, tight and scannable (newlines ARE allowed here; no markdown bold or headers):
+- Line 1: a verdict — exactly one of "Strong fit", "Good fit", "Partial fit", or "Not a strong fit" — then " — " and one short sentence on why.
+- Then one line per KEY requirement of the role (3 to 5 lines, no repeats). START each line with its marker: "✓ " when the profile clearly shows that skill/experience, or "~ " when it is missing, partial, or not mentioned. NEVER put ✓ on something absent, and never mark a clear strength with ~. Format each as: "✓ <requirement> — <his specific project/skill/role>"  OR  "~ <requirement> — not in his profile". Example: "✓ Real-time voice — Bhumi, his sub-800ms voice agent on LiveKit".
+- NEVER invent skills, tools, employers, or experience. (His core strengths ARE: agentic/multi-agent AI with LangGraph/CrewAI/PraisonAI, real-time voice AI, RAG, and Generative AI/LLMs — mark those ✓ when the role asks for them.)
+- Final line: "Reach him → hariharanjoga445@gmail.com".
+
+Use ONLY the profile below. No preamble before the verdict line.
+
+=== HARIHARAN PROFILE ===
+${PROFILE}`;
+
 // Rotate across multiple NVIDIA keys (each free key is ~40 req/min). Round-robin
 // spreads load; on a rate-limit (429) we immediately fail over to the next key.
 const KEYS = [
@@ -42,8 +56,8 @@ function rateLimited(ip: string): boolean {
 type Msg = { role: "system" | "user" | "assistant"; content: string };
 
 // Try keys in rotation; on 429 / 5xx, immediately move to the next key.
-async function openStream(messages: Msg[]) {
-  const model = process.env.CHAT_MODEL || "meta/llama-3.1-8b-instruct";
+async function openStream(messages: Msg[], modelOverride?: string) {
+  const model = modelOverride || process.env.CHAT_MODEL || "meta/llama-3.1-8b-instruct";
   const n = KEYS.length;
   let lastErr: unknown;
   for (let i = 0; i < n; i++) {
@@ -69,13 +83,27 @@ async function openStream(messages: Msg[]) {
   throw lastErr;
 }
 
+// Fit-checks use a stronger model for better reasoning; fall back to the default if it is unavailable.
+async function getStream(messages: Msg[], mode: string) {
+  if (mode === "fit") {
+    const fitModel = process.env.FIT_MODEL || "meta/llama-3.3-70b-instruct";
+    try {
+      return await openStream(messages, fitModel);
+    } catch {
+      return await openStream(messages);
+    }
+  }
+  return openStream(messages);
+}
+
 export async function POST(req: Request) {
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
     if (rateLimited(ip)) return Response.json({ error: "rate_limited" }, { status: 429 });
 
     const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
-    const question = String(body.question || "").slice(0, 600).trim();
+    const mode = String(body.mode || "").trim();
+    const question = String(body.question || "").slice(0, mode === "fit" ? 4000 : 600).trim();
     if (!question) return Response.json({ error: "no_question" }, { status: 400 });
 
     const rawHistory = Array.isArray(body.history) ? (body.history as unknown[]) : [];
@@ -92,8 +120,11 @@ export async function POST(req: Request) {
 
     if (!KEYS.length) return Response.json({ error: "no_key" }, { status: 503 });
 
-    const messages: Msg[] = [{ role: "system", content: SYSTEM }, ...history, { role: "user", content: question }];
-    const stream = await openStream(messages);
+    const messages: Msg[] =
+      mode === "fit"
+        ? [{ role: "system", content: FIT_SYSTEM }, { role: "user", content: question }]
+        : [{ role: "system", content: SYSTEM }, ...history, { role: "user", content: question }];
+    const stream = await getStream(messages, mode);
 
     // Pipe model deltas straight to the client as plain-text chunks → instant first token.
     const encoder = new TextEncoder();
