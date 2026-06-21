@@ -176,25 +176,41 @@
   .monitor .head{display:flex;justify-content:space-between;align-items:center;font-family:var(--font-mono);
     font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
   .monitor .head .id{color:var(--cyan-dim)}
-  .gauge{font-family:var(--font-mono);font-size:12px}
+  /* gauges: each metric row lights up on hover (glow + brighten, no layout shift via offset padding) */
+  .gauge{font-family:var(--font-mono);font-size:12px;padding:5px 9px;margin:0 -9px;border-radius:9px;
+    transition:background .22s ease,box-shadow .22s ease}
+  .gauge:hover{background:rgba(34,224,255,0.06);box-shadow:inset 0 0 0 1px rgba(34,224,255,0.2)}
   .gauge .top{display:flex;justify-content:space-between;margin-bottom:6px;color:var(--muted)}
-  .gauge .top b{color:var(--text)}
-  .gauge .track{height:7px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;position:relative}
+  .gauge .top > span{transition:color .22s ease}
+  .gauge .top b{color:var(--text);transition:color .22s ease,text-shadow .22s ease}
+  .gauge:hover .top > span{color:var(--cyan-dim)}
+  .gauge:hover .top b{color:#eaf9ff;text-shadow:0 0 9px rgba(34,224,255,0.65)}
+  .gauge .track{height:7px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;position:relative;
+    transition:box-shadow .22s ease}
+  .gauge:hover .track{box-shadow:0 0 14px -2px rgba(34,224,255,0.55)}
   .gauge .track > i{display:block;height:100%;border-radius:4px;
-    background:linear-gradient(90deg,var(--cyan),var(--violet));transition:width .4s ease;
+    background:linear-gradient(90deg,var(--cyan),var(--violet));transition:width .4s ease,filter .22s ease;
     box-shadow:0 0 10px rgba(34,224,255,0.5)}
+  .gauge:hover .track > i{filter:brightness(1.28) saturate(1.15)}
   .wave{height:32px;display:flex;align-items:flex-end;gap:3px}
   .mon-row{display:flex;gap:18px;align-items:center}
-  .mon-row .gauges{flex:1;display:flex;flex-direction:column;gap:11px;min-width:0}
+  .mon-row .gauges{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
   .wave i{flex:1;background:linear-gradient(180deg,var(--cyan),rgba(34,224,255,0.1));border-radius:2px 2px 0 0;
     animation:bar 1.2s ease-in-out infinite}
   @keyframes bar{0%,100%{height:18%}50%{height:90%}}
   .radar{width:92px;height:92px;border-radius:50%;border:1px solid var(--line-strong);position:relative;
-    flex:none;margin:0;background:radial-gradient(circle,rgba(34,224,255,0.06),transparent 70%)}
+    flex:none;margin:0;background:radial-gradient(circle,rgba(34,224,255,0.06),transparent 70%);
+    transition:box-shadow .25s ease,transform .25s ease,border-color .25s ease}
+  .radar:hover{transform:scale(1.05);border-color:var(--cyan);box-shadow:0 0 24px -2px rgba(34,224,255,0.5)}
   .radar::before{content:'';position:absolute;inset:0;border-radius:50%;
     background:conic-gradient(from 0deg,transparent 0deg,rgba(34,224,255,0.5) 40deg,transparent 60deg);
     animation:spin 3s linear infinite}
+  .radar:hover::before{animation-duration:1.2s}
   .radar::after{content:'';position:absolute;inset:34px;border-radius:50%;border:1px solid var(--line)}
+  /* the SYS_MONITOR / STATUS header values brighten on hover too */
+  .monitor .head .id{transition:color .22s ease,text-shadow .22s ease}
+  .monitor .head:hover .id{text-shadow:0 0 9px currentColor}
+  @media(prefers-reduced-motion:reduce){ .radar:hover{transform:none} }
 
   /* hero ASK panel (input + clickable starter questions) */
   .askpanel{display:flex;flex-direction:column;gap:12px;
@@ -465,9 +481,96 @@
   @keyframes ring{0%{transform:scale(.8);opacity:.8}100%{transform:scale(1.5);opacity:0}}
   @media(max-width:560px){.ask-fab span{display:none}.ask-fab{padding:14px;border-radius:50%}}
 
+  /* ---------- field reports (testimonials) ---------- */
+  .reports-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}
+  .quote-card{display:flex;flex-direction:column;gap:14px;transition:transform .25s,box-shadow .25s,border-color .25s}
+  .quote-card:hover{border-color:var(--line-strong);transform:translateY(-3px);box-shadow:0 16px 42px -22px rgba(0,0,0,.65),0 0 32px -12px rgba(34,224,255,.28)}
+  .qr-head{display:flex;justify-content:space-between;align-items:center}
+  .qr-mark{font-family:var(--font-display);font-size:30px;line-height:.7;color:var(--cyan)}
+  .qr-sig{font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;color:var(--muted-2);text-transform:uppercase}
+  .quote-card blockquote{margin:0;font-size:14px;line-height:1.62;color:#cdd8e6;flex:1}
+  .quote-card figcaption{display:flex;flex-direction:column;gap:3px;border-top:1px solid var(--line);padding-top:12px}
+  .qr-name{font-family:var(--font-display);font-size:14px;color:var(--text);letter-spacing:.02em}
+  .qr-role{font-family:var(--font-mono);font-size:11px;color:var(--cyan-dim)}
+
+  /* ---------- credentials (achievements + certifications) ---------- */
+  .cred-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:30px}
+  .cred-col{display:flex;flex-direction:column;gap:14px}
+  .cred-col .head{display:flex;justify-content:space-between;align-items:center;font-family:var(--font-mono);
+    font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+  .cred-col .head .id{color:var(--cyan-dim)}
+  .cred-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+  .cred-list li{display:flex;gap:13px;align-items:flex-start;padding:9px 11px;border-radius:10px;border:1px solid transparent;transition:background .2s,border-color .2s}
+  .cred-list li:hover{background:rgba(34,224,255,.05);border-color:var(--line)}
+  .cred-ic{flex:none;width:27px;height:27px;border-radius:7px;display:grid;place-items:center;font-size:13px;
+    color:var(--cyan);border:1px solid var(--line-strong);background:rgba(34,224,255,.06)}
+  .cred-list li > div{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .cred-list b{font-size:13.5px;color:var(--text);font-weight:600}
+  .cred-list span{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);line-height:1.4}
+  @media(max-width:900px){.reports-grid{grid-template-columns:1fr}.cred-grid{grid-template-columns:1fr}}
+
   /* ---------- AI-guided focus highlight ---------- */
   .ai-focus{animation:aiFocus 2.6s cubic-bezier(.2,.7,.2,1)}
   @keyframes aiFocus{0%{box-shadow:0 0 0 0 rgba(34,224,255,0)}12%{box-shadow:0 0 0 2px var(--cyan),0 0 38px rgba(34,224,255,.45)}100%{box-shadow:0 0 0 0 rgba(34,224,255,0)}}
+
+  /* ---------- spotlight focus engine: gently dim the page, cut a bright hole over the focused section ---------- */
+  #spotlight{position:fixed;inset:0;z-index:6;pointer-events:none;opacity:0;transition:opacity .55s ease;
+    background:radial-gradient(circle at var(--sx,50%) var(--sy,50%),
+      rgba(4,7,12,0) 0,
+      rgba(4,7,12,0) calc(var(--sr,220px) - 55px),
+      rgba(4,7,12,.34) var(--sr,220px),
+      rgba(4,7,12,.66) calc(var(--sr,220px) + 300px))}
+  #spotlight.on{opacity:1}
+  .spot-target{box-shadow:0 0 0 1px rgba(34,224,255,.5),0 0 55px -4px rgba(34,224,255,.38);border-radius:14px;transition:box-shadow .5s ease}
+  /* desktop: narrow the page so it reflows into the space beside the chat (zoom doesn't shrink a full-width block) */
+  @media(min-width:1024px){
+    main{transition:width .4s cubic-bezier(.3,.8,.3,1)}
+    body.chat-push main{width:calc(100vw - 446px);overflow-x:clip}
+  }
+  @media(prefers-reduced-motion:reduce){
+    #spotlight{transition:opacity .15s linear}
+    main{transition:none}
+  }
+
+  /* ---------- voice orb: futuristic audio-reactive indicator that glides to sit near (never over) the focus ---------- */
+  #vorb{position:fixed;left:var(--ox,50%);top:var(--oy,80%);z-index:760;width:150px;height:150px;--amp:1;
+    transform:translate(-50%,-50%) scale(.55);opacity:0;pointer-events:none;
+    transition:opacity .45s ease,transform .5s cubic-bezier(.2,.85,.2,1),left .55s cubic-bezier(.3,.8,.3,1),top .55s cubic-bezier(.3,.8,.3,1)}
+  #vorb.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  #vorb>div{position:absolute;border-radius:50%}
+  .vorb-halo{inset:-42px;background:radial-gradient(circle,rgba(34,224,255,.30),rgba(176,107,255,.13) 46%,transparent 70%);
+    filter:blur(16px);animation:vbreath 3.4s ease-in-out infinite}
+  .vorb-core{inset:0;
+    background:
+      radial-gradient(circle at 32% 30%, #6ef2ff, transparent 55%),
+      radial-gradient(circle at 70% 38%, var(--violet), transparent 52%),
+      radial-gradient(circle at 50% 80%, var(--magenta), transparent 55%),
+      conic-gradient(from 0deg, var(--cyan), var(--violet), var(--magenta), #58ecff, var(--cyan));
+    filter:blur(11px) saturate(1.3);
+    rotate:0deg;scale:var(--amp);animation:vspin 9s linear infinite;transition:scale .09s ease-out}
+  .vorb-ring{inset:4px;border:1.5px solid rgba(184,238,255,.6);
+    box-shadow:0 0 24px rgba(34,224,255,.5),inset 0 0 30px rgba(34,224,255,.3);
+    scale:var(--amp);transition:scale .09s ease-out}
+  .vorb-stat{position:absolute;border-radius:0;top:calc(100% + 24px);left:50%;transform:translateX(-50%);
+    display:flex;align-items:center;gap:8px;white-space:nowrap;
+    font-family:var(--font-mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan)}
+  .vorb-stat i{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 1.3s ease-in-out infinite}
+  @keyframes vspin{to{rotate:360deg}}
+  @keyframes vbreath{0%,100%{transform:scale(.9);opacity:.68}50%{transform:scale(1.1);opacity:1}}
+  /* thinking: quick cyan shimmer while the model + TTS are working (masks the unavoidable round-trip) */
+  #vorb.thinking .vorb-core{animation-duration:2.6s}
+  #vorb.thinking .vorb-halo{animation-duration:1s}
+  /* speaking: faster spin + magenta accent, scale reacts to the live audio */
+  #vorb.speaking .vorb-core{animation-duration:4.5s}
+  #vorb.speaking .vorb-halo{animation-duration:1.7s}
+  #vorb.speaking .vorb-stat{color:var(--magenta)}
+  #vorb.speaking .vorb-stat i{background:var(--magenta);box-shadow:0 0 10px var(--magenta)}
+  @media(max-width:560px){#vorb{width:124px;height:124px}}
+  @media(prefers-reduced-motion:reduce){
+    .vorb-core,.vorb-halo,.vorb-stat i{animation:none}
+    .vorb-core{rotate:0deg}
+    #vorb{transition:opacity .2s linear}
+  }
 
   /* ---------- live project preview ---------- */
   #live-scrim{position:fixed;inset:0;background:rgba(2,6,12,0.72);backdrop-filter:blur(7px) saturate(1.1);opacity:0;pointer-events:none;transition:opacity .35s;z-index:90}
@@ -506,7 +609,7 @@
     background:linear-gradient(180deg,rgba(8,12,18,0.96),rgba(6,9,14,0.98));
     border-left:1px solid var(--line-strong);backdrop-filter:blur(14px);
     display:flex;flex-direction:column;transform:translateX(105%);transition:transform .4s cubic-bezier(.3,.8,.3,1);
-    box-shadow:-30px 0 80px -30px rgba(0,0,0,0.8)}
+    box-shadow:-14px 0 48px -30px rgba(0,0,0,0.7)}
   #chat.open{transform:none}
   #chat::before{content:'';position:absolute;top:0;left:0;width:2px;height:100%;
     background:linear-gradient(180deg,var(--cyan),var(--violet),transparent)}

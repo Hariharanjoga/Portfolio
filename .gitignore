@@ -16,10 +16,15 @@ _shotter/*.png
 _shotter/tts_out.mp3
 _nx_*.png
 _v_*.png
+*-test.jpeg
+*-layout.jpeg
+.playwright-mcp/
 
 # ===== Logs / OS / editor / misc =====
 *-debug.log*
 npm-debug.log*
+**/.devlog.txt
+**/.deverr.txt
 .DS_Store
 Thumbs.db
 *.pem

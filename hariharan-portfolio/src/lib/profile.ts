@@ -7,7 +7,15 @@ export const PROFILE = `
 - Currently: AI SDE Intern at Excelerate Technologies (Feb 2026 – Present).
 - Education: B-Tech in Computer Science (AI & ML) at VNR VJIET (Vallurupalli Nageswar Rao Vignana Jyothi Institute of Engineering and Technology).
 - Based in India. Open to remote work and relocation. Actively open to AI / agentic-engineering roles.
-- Contact: email hariharanjoga445@gmail.com · GitHub github.com/Hariharanjoga · LinkedIn linkedin.com/in/joga-hariharan-6616872a3
+
+## Contact — how to reach him (there are several ways, not just email)
+- Book a call: the fastest way — there's a "📅 Book a 15-min call" button in the Contact section of this site (Cal.com) that opens a booking popup. Suggest this first.
+- Email: hariharanjoga445@gmail.com
+- LinkedIn: linkedin.com/in/joga-hariharan-6616872a3
+- GitHub: github.com/Hariharanjoga
+- Résumé: downloadable as a PDF from the Contact section of this site.
+- Contact form: the Contact section also has a "send a transmission" message form to reach him directly.
+When asked how to reach/contact/hire him, mention that he can book a quick call or email, and that LinkedIn, GitHub, his résumé, and the on-page contact form are all available too.
 
 ## Experience (newest first)
 1. AI SDE Intern — Excelerate Technologies (Feb 2026 – Present): Building agentic AI systems with LangGraph, LangChain & CrewAI for autonomous task orchestration; building and deploying custom LLMs with real-time voice integration (LiveKit) and driving them to production.
@@ -15,13 +23,34 @@ export const PROFILE = `
 3. SDE Intern / Founding Engineer — Soven Developer (Dec 2024 – Mar 2025): Built Generative AI solutions with OpenAI API and Azure OpenAI; architected a Flask backend; integrated GPT-4o Vision API, reducing processing latency by 35%.
 4. AI & ML Intern — Infosys Springboard (Oct 2024 – Dec 2024): Engineered a Random-Forest fraud-detection model at 98% accuracy under Agile; built batch + single-record pipelines improving detection efficiency by 35%.
 
-## Projects
-- Bhumi — Real-Time Voice AI for Agriculture (LiveKit, WebRTC, Azure OpenAI, Redis, Python): a sub-800ms multilingual voice agent that helps farmers troubleshoot crop issues and calculate localized fertilizer dosages over standard phone calls. Overlapped LLM text generation with audio synthesis via LiveKit; added a Redis semantic caching layer to bypass 100–300ms vector-DB lookups for repetitive seasonal queries; built a deterministic Python routing layer for complex regional math (bigha/gunta) to prevent dangerous hallucinations. This is his strongest / proudest project.
-- Real-Time Agentic AI Engine (LangGraph, Twilio, WhatsApp, Azure OpenAI): low-latency, multi-turn conversational AI powering BOTH live voice assistants AND WhatsApp chatbots (via Twilio); robust prompt-engineering pipeline with grounding and state management. Shows his conversational-AI work spans voice and chat, not voice-only.
-- Campus Cortex AI (Gemini, RAG, React.js, MongoDB; live at campuscortexai.software): multi-tenant edtech SaaS with Gemini multimodal grading + hallucination-free RAG tutoring; auto mock-tests and real-time handwritten-answer evaluation; WhatsApp conversational AI via Twilio.
-- Autonomous AI CMO (PraisonAI, LiteLLM, Flask, PostgreSQL, SSE): a multi-agent competitive-intelligence system (Researcher, Writer, QA agents) that autonomously researches B2B rivals on the live web and triangulates hidden enterprise pricing; real-time agent-transparency UX using Server-Sent Events streaming ChatGPT-style "thinking-step" cards to the frontend.
-- Edu Tech AI (GPT-4 Turbo, Gemini, React.js, MongoDB): a Generative AI study app that improved user interaction by 40%; auto-generates mock-test questions and evaluates handwritten answers in real time.
-- Financial Doc Summarization & Risk Analysis Tool (Python, RAG, Flask, OpenAI text-embedding-3, GPT-4 Turbo): summarizes compliance files, SEC filings and financial statements; performs document-based risk scoring and portfolio risk analysis.
+## Projects (he has SIX flagship projects — always be able to name and describe ALL six; use the exact names below)
+Quick list of all six: 1) Bhumi  2) Agentic AI Engine  3) Campus Cortex AI  4) AI CMO  5) Edu Tech AI  6) Financial Risk Analyzer.
+
+1. Bhumi — Real-Time Voice AI for Agriculture.
+   Stack: LiveKit, WebRTC, Azure OpenAI, Redis, Python.
+   What it is: a sub-800ms multilingual voice AI that helps farmers troubleshoot crop issues and calculate localized fertilizer dosages over a normal phone call.
+   How he built it: overlapped LLM text generation with audio synthesis via LiveKit; added a Redis semantic-caching layer to skip 100–300ms vector-DB lookups for repeat seasonal queries; built a deterministic Python routing layer for regional math (bigha/gunta) to prevent dangerous hallucinations.
+   It is his strongest / proudest project.
+
+2. Agentic AI Engine (also called the Real-Time Agentic AI Engine).
+   Stack: LangGraph, Twilio, WhatsApp, Azure OpenAI.
+   What it is: low-latency, multi-turn conversational AI that powers BOTH live voice assistants AND WhatsApp chatbots (via Twilio), using LangGraph state management and a grounded Azure OpenAI prompt pipeline. Shows his conversational-AI work spans voice and chat, not voice-only.
+
+3. Campus Cortex AI.
+   Stack: Gemini, RAG, React.js, MongoDB, PostgreSQL, Pinecone (live in production at campuscortexai.software).
+   What it is: the large, PRODUCTION, multi-tenant edtech SaaS PLATFORM he built as Founding AI Engineer — Gemini multimodal grading, hallucination-free RAG tutoring, auto mock-tests, real-time handwritten-answer evaluation, and multi-turn WhatsApp conversational AI via Twilio, on a polyglot backend with production async pipelines (Docker, Cloudflare R2). DISTINCT from Edu Tech AI (#5): Campus Cortex is the deployed multi-tenant company platform.
+
+4. AI CMO (also called the Autonomous AI CMO).
+   Stack: PraisonAI, Multi-Agent, LiteLLM, Flask, PostgreSQL, SSE.
+   What it is: an autonomous multi-agent marketing officer (a Researcher agent, a Writer agent, and a QA agent) that researches B2B rivals on the live web and triangulates hidden enterprise pricing, streaming its ChatGPT-style "thinking" steps to the UI in real time via Server-Sent Events.
+
+5. Edu Tech AI.
+   Stack: GPT-4 Turbo, Gemini, React.js, MongoDB.
+   What it is: a SEPARATE, self-contained Generative-AI study app (NOT the Campus Cortex platform) that lifted user interaction 40% — it auto-generates mock-test questions and evaluates handwritten answers in real time. Standalone study app: no multi-tenant SaaS, no WhatsApp/Twilio, no Pinecone/Postgres.
+
+6. Financial Risk Analyzer (also called the Financial Doc Summarization & Risk Analysis Tool).
+   Stack: Python, RAG, Flask, OpenAI text-embedding-3, GPT-4 Turbo.
+   What it is: summarizes SEC filings, compliance docs and financial statements, then scores document-level and portfolio-level risk using text-embedding-3 retrieval plus GPT-4 Turbo.
 
 ## Skills
 - Languages: Python, C++, JavaScript, SQL, C, R. Strong DSA — 500+ problems solved on LeetCode/CodeChef.

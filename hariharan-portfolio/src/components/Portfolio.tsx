@@ -216,9 +216,59 @@ const MARKUP = `<!-- background -->
     </div>
   </section>
 
+  <!-- FIELD REPORTS (testimonials) -->
+  <!-- NOTE: names are real (provided by Hariharan); quote wording is drafted — confirm each person is happy with it. -->
+  <section id="reports">
+    <div class="eyebrow"><span class="idx">05</span> // field reports</div>
+    <h2 class="section-title reveal">What others say.</h2>
+    <div class="reports-grid">
+      <figure class="panel quote-card reveal" data-hot>
+        <div class="qr-head"><span class="qr-mark">&#10078;</span><span class="qr-sig">// transmission_01</span></div>
+        <blockquote>As our founding AI engineer, he took Campus Cortex from concept to a multi-tenant platform in production — the RAG tutoring and Gemini grading he built are the core of the product.</blockquote>
+        <figcaption><span class="qr-name">Bhavani</span><span class="qr-role">Founder · Campus Cortex AI</span></figcaption>
+      </figure>
+      <figure class="panel quote-card reveal" data-hot>
+        <div class="qr-head"><span class="qr-mark">&#10078;</span><span class="qr-sig">// transmission_02</span></div>
+        <blockquote>He ships voice agents that actually feel real-time. Sub-second latency on a live phone call is hard, and he made it look routine.</blockquote>
+        <figcaption><span class="qr-name">Sanath</span><span class="qr-role">Mentor</span></figcaption>
+      </figure>
+      <figure class="panel quote-card reveal" data-hot>
+        <div class="qr-head"><span class="qr-mark">&#10078;</span><span class="qr-sig">// transmission_03</span></div>
+        <blockquote>He built our Generative-AI features end to end — integrated GPT-4o Vision and shipped a production Flask backend faster than I'd expect from anyone, let alone an intern.</blockquote>
+        <figcaption><span class="qr-name">Aakarsh Sharma</span><span class="qr-role">Founder · Soven Developer</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- CREDENTIALS (achievements + certifications) -->
+  <section id="credentials">
+    <div class="eyebrow"><span class="idx">06</span> // clearance &amp; commendations</div>
+    <h2 class="section-title reveal">Proof of work.</h2>
+    <div class="cred-grid">
+      <div class="panel cred-col reveal">
+        <div class="head"><span>ACHIEVEMENTS</span><span class="id">// commendations</span></div>
+        <ul class="cred-list">
+          <li><span class="cred-ic">★</span><div><b>SIH 2024 Finalist</b><span>Top 5 of 400+ teams · Smart India Hackathon</span></div></li>
+          <li><span class="cred-ic">★</span><div><b>Designathon Finalist</b><span>Top 10 of 500+ teams</span></div></li>
+          <li><span class="cred-ic">★</span><div><b>TS EAMCET — Top 0.4%</b><span>of all candidates statewide</span></div></li>
+          <li><span class="cred-ic">⬡</span><div><b>Chairperson — Krithomedh</b><span>Technical club · VNR VJIET</span></div></li>
+          <li><span class="cred-ic">⬡</span><div><b>Associate President — Street Cause</b><span>Student-run NGO · VNR VJIET</span></div></li>
+        </ul>
+      </div>
+      <div class="panel cred-col reveal">
+        <div class="head"><span>CERTIFICATIONS</span><span class="id">// verified</span></div>
+        <ul class="cred-list">
+          <li><span class="cred-ic">✓</span><div><b>Building Voice Agents — LiveKit</b><span>Taught by the LiveKit founders</span></div></li>
+          <li><span class="cred-ic">✓</span><div><b>Generative AI / Applied LLMs</b><span>AI principles · prompt design · responsible AI</span></div></li>
+          <li><span class="cred-ic">✓</span><div><b>NPTEL — C++</b><span>Programming certification</span></div></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
   <!-- CONTACT -->
   <section id="contact">
-    <div class="eyebrow"><span class="idx">05</span> // establish contact</div>
+    <div class="eyebrow"><span class="idx">07</span> // establish contact</div>
     <h2 class="section-title reveal">Let's build something.</h2>
     <p class="lead reveal">Recruiters, founders, collaborators — if it's interesting and hard, I want to hear about it. Send a transmission, book a call, or grab my email.</p>
 
@@ -265,6 +315,17 @@ const MARKUP = `<!-- background -->
 <!-- floating ASK AI dock -->
 <div class="fab-dock">
   <button class="ask-fab" id="ask-fab"><span class="orb"><i></i></span><span>ASK&nbsp;AI</span></button>
+</div>
+
+<!-- spotlight overlay: dims the page around the AI-focused section -->
+<div id="spotlight"></div>
+
+<!-- voice orb: shown while the chat is hidden during a spoken turn -->
+<div id="vorb" aria-hidden="true">
+  <div class="vorb-halo"></div>
+  <div class="vorb-core"></div>
+  <div class="vorb-ring"></div>
+  <div class="vorb-stat"><i></i><span>Listening…</span></div>
 </div>
 
 <!-- chat drawer (NEURAL_LINK) -->
@@ -439,7 +500,8 @@ document.getElementById('copymail').addEventListener('click',function(){
     {n:'Ask my AI anything',k:'✦',h:'chat'},
     {n:'Go to whoami',k:'01',h:'#about'},{n:'Go to projects',k:'02',h:'#projects'},
     {n:'Go to experience',k:'03',h:'#experience'},{n:'Go to stack',k:'04',h:'#stack'},
-    {n:'Go to contact',k:'05',h:'#contact'},{n:'Copy email',k:'✉',h:'copy'},
+    {n:'Go to field reports',k:'05',h:'#reports'},{n:'Go to credentials',k:'06',h:'#credentials'},
+    {n:'Go to contact',k:'07',h:'#contact'},{n:'Copy email',k:'✉',h:'copy'},
     {n:'Open GitHub',k:'↗',h:'#'},{n:'Open LinkedIn',k:'↗',h:'#'},{n:'Download résumé',k:'⤓',h:'#'},
   ];
   let active=0,filtered=cmds;
@@ -549,16 +611,97 @@ document.getElementById('copymail').addEventListener('click',function(){
     if(items.length) html+='<div class="fit-foot">Reach him → hariharanjoga445@gmail.com</div>';  // always show the contact CTA
     return html||clean(t);
   }
-  // AI-guided navigation: scroll to + pulse the section/project the answer is about
+  // ---------- spotlight engine: gently dim the page, keep a bright hole over the focused element ----------
+  const DESKTOP=()=>window.matchMedia('(min-width:1024px)').matches;
+  const REDUCED=()=>window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const sp=document.getElementById('spotlight');
+  let spotEl=null,spotRaf=0;
+  // desktop: add a class that narrows <main> via CSS calc so the page reflows beside the chat (auto-adapts on resize)
+  function pushPage(on){ document.body.classList.toggle('chat-push', !!on && DESKTOP()); }
+  function placeSpot(){
+    if(!spotEl||!sp)return;
+    const r=spotEl.getBoundingClientRect();
+    const cx=r.left+r.width/2, cy=r.top+r.height/2;
+    const rad=Math.min(Math.max(r.width,r.height)/2+75, Math.max(window.innerWidth,window.innerHeight)*0.6);
+    sp.style.setProperty('--sx',cx+'px'); sp.style.setProperty('--sy',cy+'px'); sp.style.setProperty('--sr',rad+'px');
+  }
+  function spotlightOn(el){
+    if(!el||!sp)return;
+    if(spotEl&&spotEl!==el)spotEl.classList.remove('spot-target');
+    spotEl=el; el.classList.add('spot-target');
+    placeSpot(); sp.classList.add('on');
+  }
+  function spotlightOff(){ if(sp)sp.classList.remove('on'); if(spotEl){spotEl.classList.remove('spot-target');spotEl=null;} }
+  function trackSpot(){ // follow the target + orb through the scroll / shrink / reopen animations
+    let n=0; const step=REDUCED()?60:16, max=REDUCED()?6:40;
+    const iv=setInterval(()=>{ placeSpot(); placeOrb(); if(++n>max)clearInterval(iv); }, step);
+  }
+  window.addEventListener('scroll',()=>{ if(spotEl){ if(spotRaf)cancelAnimationFrame(spotRaf); spotRaf=requestAnimationFrame(()=>{placeSpot();placeOrb();});} },{passive:true});
+  window.addEventListener('resize',()=>{ if(!DESKTOP())document.body.classList.remove('chat-push'); if(spotEl)placeSpot(); placeOrb(); },{passive:true});
+
+  // ---------- voice auto-shrink: during a SPOKEN turn, slide the chat away, reveal the orb + spotlight,
+  //            let the bot speak, then slide the chat back once the bot is done AND the user is silent ----------
+  const vorb=document.getElementById('vorb');
+  const vstatEl=vorb&&vorb.querySelector('.vorb-stat span');
+  let vActive=false, turnDone=false, ttsPending=0, reopenTimer=0;
+  const REOPEN_MS=800;
+  // glide the orb into the dim area just below the focused element (or above if there's no room) — never over it
+  function placeOrb(){
+    if(!vorb)return;
+    const vw=window.innerWidth, vh=window.innerHeight, R=(vorb.offsetWidth||150)/2, pad=22, lbl=30;
+    let ox=vw/2, oy=vh-R-pad-lbl;                                  // default: bottom-centre
+    if(spotEl){
+      const r=spotEl.getBoundingClientRect();
+      if(r.bottom+pad+R*2+lbl < vh) oy=r.bottom+pad+R;            // room below the element → sit under it
+      else if(r.top-pad-R > pad) oy=r.top-pad-R;                  // else tuck above it
+      else oy=vh-R-pad-lbl;                                       // else fall back to the bottom
+      ox=Math.min(Math.max(r.left+r.width/2, R+pad), vw-R-pad);   // centre on the element, clamped on-screen
+    }
+    vorb.style.setProperty('--ox',ox+'px'); vorb.style.setProperty('--oy',oy+'px');
+  }
+  function orbState(s){ if(!vorb)return;                                                       // 'listen' | 'think' | 'speak'
+    vorb.classList.toggle('speaking',s==='speak'); vorb.classList.toggle('thinking',s==='think');
+    if(vstatEl)vstatEl.textContent = s==='speak'?'Speaking…' : s==='think'?'Thinking…' : 'Listening…'; }
+  function showOrb(s){ if(vorb)vorb.classList.add('on'); placeOrb(); orbState(s||'listen'); }
+  function hideOrb(){ if(vorb)vorb.classList.remove('on'); }
+  function chatVisible(v){ chat.classList.toggle('open',v); pushPage(v); if(!DESKTOP()&&!v)scrim.classList.remove('open'); }
+  function enterVoiceAnswer(){ clearTimeout(reopenTimer); vActive=true; turnDone=false; chatVisible(false); showOrb('think'); }  // user just spoke → processing
+  function voiceSpeaking(){ if(vActive){showOrb('speak');placeOrb();} }                                                          // bot audio started
+  function maybeBotDone(){ if(vActive&&turnDone&&ttsPending<=0){ orbState('listen'); clearTimeout(reopenTimer); reopenTimer=setTimeout(reopenChat,REOPEN_MS); } }
+  function reopenChat(){ if(!vActive)return; vActive=false; hideOrb(); chatVisible(true); if(spotEl)trackSpot(); body.scrollTop=body.scrollHeight; }
+  function userSpeakingNow(){ if(reopenTimer){clearTimeout(reopenTimer);reopenTimer=0;} if(vActive)orbState('listen'); }          // user talks again before reopen → stay closed
+
+  // audio-reactive: route TTS playback through an analyser → drive the orb's --amp in real time
+  let ttsCtx=null,ttsAnalyser=null,ampData=null,ampRaf=0;
+  function ensureTTSCtx(){ if(ttsCtx)return ttsCtx;
+    try{ const AC=window.AudioContext||window.webkitAudioContext; ttsCtx=new AC();
+      ttsAnalyser=ttsCtx.createAnalyser(); ttsAnalyser.fftSize=256; ttsAnalyser.smoothingTimeConstant=0.75;
+      ttsAnalyser.connect(ttsCtx.destination); ampData=new Uint8Array(ttsAnalyser.frequencyBinCount);
+    }catch(_){ ttsCtx=null; } return ttsCtx; }
+  function attachAudio(a){ // tap the element into the analyser graph; only reroute if the ctx is genuinely running (else play natively)
+    if(!ensureTTSCtx())return false;
+    if(ttsCtx.state!=='running'){ try{ttsCtx.resume();}catch(_){} return false; }
+    try{ ttsCtx.createMediaElementSource(a).connect(ttsAnalyser); return true; }catch(_){ return false; }
+  }
+  function ampLoop(){ if(!ttsAnalyser||!vorb){ampRaf=0;return;}
+    ttsAnalyser.getByteFrequencyData(ampData);
+    let s=0; for(let i=0;i<ampData.length;i++)s+=ampData[i];
+    const avg=s/ampData.length/255, amp=1+Math.min(avg*1.7,0.42);
+    vorb.style.setProperty('--amp',amp.toFixed(3)); ampRaf=requestAnimationFrame(ampLoop); }
+  function startAmp(){ if(!ampRaf&&ttsAnalyser)ampRaf=requestAnimationFrame(ampLoop); }
+  function stopAmp(){ if(ampRaf){cancelAnimationFrame(ampRaf);ampRaf=0;} if(vorb)vorb.style.setProperty('--amp','1'); }
+
+  // AI-guided navigation: scroll to + spotlight the section/project the answer is about
   function doFocus(id){
     if(!id||id==='none')return;
-    const sec={about:'#about',projects:'#projects',experience:'#experience',skills:'#stack',contact:'#contact'};
+    const sec={about:'#about',projects:'#projects',experience:'#experience',skills:'#stack',reports:'#reports',credentials:'#credentials',contact:'#contact'};
     const proj={bhumi:'Bhumi','agentic-engine':'Agentic AI Engine','campus-cortex':'Campus Cortex AI','ai-cmo':'AI CMO','edu-tech':'Edu Tech AI',financial:'Financial Risk Analyzer'};
     let el=null,block='start';
     if(sec[id])el=document.querySelector(sec[id]);
     else if(proj[id]){ el=[].slice.call(document.querySelectorAll('#projects .card')).find(c=>{const h=c.querySelector('h3');return h&&h.textContent.trim()===proj[id];}); block='center'; }
     if(!el)return;
-    try{el.scrollIntoView({behavior:'smooth',block:block});}catch(_){el.scrollIntoView();}
+    try{el.scrollIntoView({behavior:REDUCED()?'auto':'smooth',block:block});}catch(_){el.scrollIntoView();}
+    spotlightOn(el); trackSpot();
     el.classList.remove('ai-focus'); void el.offsetWidth; el.classList.add('ai-focus');
     setTimeout(()=>el.classList.remove('ai-focus'),2700);
   }
@@ -570,6 +713,8 @@ document.getElementById('copymail').addEventListener('click',function(){
     if(/campus|cortex|edtech|tutor|grading/.test(q))return'campus-cortex';
     if(/edu ?tech|study app|mock test|handwritten/.test(q))return'edu-tech';
     if(/financ|\bsec\b|risk|compliance|filing|\bdocument/.test(q))return'financial';
+    if(/testimonial|recommend|reference|review|what.*(say|said)|vouch|feedback/.test(q))return'reports';
+    if(/achiev|award|certif|cert\b|finalist|hackathon|\bsih\b|eamcet|leadership|chairperson|accolade|recogni/.test(q))return'credentials';
     if(/experience|\brole\b|career|intern|\bjob\b|worked|excelerate|soven|infosys/.test(q))return'experience';
     if(/skill|stack|\btech\b|language|tool|framework|proficien/.test(q))return'skills';
     if(/contact|email|reach|\bhire\b|connect|availab|book|call|r[ée]sum[ée]|resume|linkedin|github/.test(q))return'contact';
@@ -589,24 +734,27 @@ document.getElementById('copymail').addEventListener('click',function(){
     const willSpeak=!!(voiceOn||(opts&&opts.spoken));
     const ctrl=new AbortController(); currentAbort=ctrl;
     const t=typingBubble();
-    let bubble=null,acc='',spokenUpto=0;
+    let bubble=null,acc='',spokenUpto=0,firstSpoken=true;
     const ensure=()=>{ if(!bubble){t.remove();bubble=addMsg('bot','');} return bubble; };
     const sayClean=s=>s.replace(/\[(.*?)\]\([^)]*\)/g,'$1').replace(/[*_`#>]/g,'').replace(/^\s*[-•]\s+/gm,'').trim(); // don't read markdown aloud
-    // speak complete sentences as they stream → voice starts on sentence 1, not the whole answer
+    // speak as it streams; the FIRST chunk fires on the first clause (comma) for a fast start, then full sentences
     function flushSpeech(final){
       if(!willSpeak||myGen!==genId)return;
       let lastB=-1;
-      for(let j=spokenUpto;j<acc.length;j++){const c=acc[j];if(c==='.'||c==='!'||c==='?'||c==='\n')lastB=j;}
-      if(lastB>=spokenUpto){ const chunk=sayClean(acc.slice(spokenUpto,lastB+1)); if(chunk.length>1)speakChunk(chunk,myGen); spokenUpto=lastB+1; }
+      for(let j=spokenUpto;j<acc.length;j++){ const c=acc[j];
+        if(c==='.'||c==='!'||c==='?'||c==='\n'){ lastB=j; if(firstSpoken)break; }
+        else if(firstSpoken&&c===','&&(j-spokenUpto)>=12){ lastB=j; break; }   // first audio: break on the first real clause so speech starts sooner
+      }
+      if(lastB>=spokenUpto){ const chunk=sayClean(acc.slice(spokenUpto,lastB+1)); if(chunk.length>1){speakChunk(chunk,myGen);firstSpoken=false;} spokenUpto=lastB+1; }
       if(final){ const tail=sayClean(acc.slice(spokenUpto)); if(tail.length>1)speakChunk(tail,myGen); spokenUpto=acc.length; }
     }
     // No canned answers — if the model can't be reached, show an honest error (never fake facts).
     const fallback=()=>{ if(myGen!==genId)return; const b=ensure();
       b.innerHTML="⚠ I couldn't reach my AI just now — please try again in a moment, or email <b>hariharanjoga445@gmail.com</b>.";
-      busy=false;renderChips(); };
+      busy=false;renderChips(); turnDone=true; maybeBotDone(); };                   // error → reopen the chat so the message is read
     const finishLive=()=>{ if(myGen!==genId)return; busy=false;renderChips();const said=acc.trim();
       if(fit)ensure().innerHTML=formatFit(acc);                                      // final formatted fit card
-      history.push({role:'assistant',content:said}); flushSpeech(true); };
+      history.push({role:'assistant',content:said}); turnDone=true; flushSpeech(true); maybeBotDone(); };  // turn fully streamed → arm reopen once audio drains
     // stream the live answer from the NVIDIA-backed /api/chat, word-by-word as it's generated
     fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({question:text,history:prior,mode:fit?'fit':undefined}),signal:ctrl.signal})
@@ -626,7 +774,8 @@ document.getElementById('copymail').addEventListener('click',function(){
   }
   function openChat(prefill,opts){
     opts=opts||{};
-    chat.classList.add('open');scrim.classList.add('open');
+    chat.classList.add('open');
+    if(DESKTOP())pushPage(true); else scrim.classList.add('open'); // desktop shrinks the page to fit; mobile dims it
     if(prefill){greeted=true;setTimeout(()=>send(prefill),420);return;}
     if(!greeted){greeted=true;
       speakGreeting(opts.afterGreet);                 // speak instantly (static file) — no 480ms wait
@@ -634,7 +783,7 @@ document.getElementById('copymail').addEventListener('click',function(){
       setTimeout(()=>{t.remove();const b=addMsg('bot','');stream(b,GREETING,renderChips);},480);
     }else{setTimeout(()=>input.focus(),420);if(opts.afterGreet)opts.afterGreet();}
   }
-  function closeChat(){chat.classList.remove('open');scrim.classList.remove('open');stopConvo();}
+  function closeChat(){chat.classList.remove('open');scrim.classList.remove('open');pushPage(false);spotlightOff();stopConvo();}
   window.__openChat=openChat;
 
   document.getElementById('ask-fab').addEventListener('click',()=>openChat());
@@ -664,17 +813,19 @@ document.getElementById('copymail').addEventListener('click',function(){
   let ttsChain=Promise.resolve();
   // barge-in: cancel any in-flight chat fetch, stop all audio, and bump the generation so
   // stale streamed text / queued TTS from the old turn can never play over a new one.
-  function bargeIn(){ if(currentAbort){try{currentAbort.abort();}catch(_){}currentAbort=null;} genId++; stopSpeak(); ttsChain=Promise.resolve(); busy=false; }
+  function bargeIn(){ if(currentAbort){try{currentAbort.abort();}catch(_){}currentAbort=null;} genId++; stopSpeak(); ttsChain=Promise.resolve(); busy=false; ttsPending=0; stopAmp(); }
   function speakChunk(text,gen){
     if(!text||!text.trim()||gen!==genId)return;
+    ttsPending++;                                        // track in-flight audio so we know when the bot is fully done
     const p=fetch('/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text})})
       .then(r=>r.ok?r.blob():null).catch(()=>null);
     ttsChain=ttsChain.then(()=>p).then(blob=>new Promise(res=>{
-      if(gen!==genId||!blob){res();return;}              // a newer turn started → skip this audio
+      if(gen!==genId||!blob){ ttsPending--; maybeBotDone(); res(); return; }   // a newer turn started → skip this audio
       const url=URL.createObjectURL(blob);const a=new Audio(url);curAudio=a;
-      a.onended=()=>{URL.revokeObjectURL(url);if(curAudio===a)curAudio=null;res();};
-      a.onerror=()=>{URL.revokeObjectURL(url);if(curAudio===a)curAudio=null;res();};
-      a.play().catch(()=>res());
+      if(vActive){ attachAudio(a); voiceSpeaking(); startAmp(); }              // voice mode → orb reacts to the live audio
+      const fin=()=>{ URL.revokeObjectURL(url); if(curAudio===a)curAudio=null; ttsPending--; if(ttsPending<=0)stopAmp(); maybeBotDone(); res(); };
+      a.onended=fin; a.onerror=fin;
+      a.play().catch(fin);
     }));
   }
   // greeting voice is a pre-baked static file (public/greeting.mp3) → preloaded on page load,
@@ -721,7 +872,7 @@ document.getElementById('copymail').addEventListener('click',function(){
       ws.onmessage=(ev)=>{ let m; try{m=JSON.parse(ev.data);}catch(_){return;}
         if(m.message_type==='committed_transcript'||m.message_type==='committed_transcript_with_timestamps'){
           const q=(m.text||'').trim(); console.log('[voice] transcript:',q);
-          if(q&&convo&&q.replace(/[\s\p{P}\p{S}]/gu,'').length>=2){ send(q,{spoken:true}); prefetchToken(); } // reply coming → socket will idle-close → keep a token ready
+          if(q&&convo&&q.replace(/[\s\p{P}\p{S}]/gu,'').length>=2){ enterVoiceAnswer(); send(q,{spoken:true}); prefetchToken(); } // slide chat away + orb, then answer aloud
         } };
       ws.onerror=()=>{ console.warn('[voice] STT socket error'); };
       ws.onclose=(e)=>{ console.log('[voice] STT socket closed',e&&e.code); if(ws!==convoWS)return; convoWS=null;
@@ -730,6 +881,7 @@ document.getElementById('copymail').addEventListener('click',function(){
   }
   async function startConvo(){
     if(convo||!canRecord)return false;
+    ensureTTSCtx(); try{ttsCtx&&ttsCtx.resume();}catch(_){}   // warm the playback ctx on this gesture so orb audio-reactivity is unlocked
     try{ convoStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}); }
     catch(_){ if(input){input.placeholder='Mic blocked — allow access';setTimeout(()=>setMic('off'),2600);} return false; }
     const AC=window.AudioContext||window.webkitAudioContext;
@@ -743,7 +895,7 @@ document.getElementById('copymail').addEventListener('click',function(){
     convoProc=convoCtx.createScriptProcessor(2048,1,1);
     convoMute=convoCtx.createGain(); convoMute.gain.value=0;
     srcN.connect(convoProc); convoProc.connect(convoMute); convoMute.connect(convoCtx.destination);
-    const BARGE=0.10, BARGE_MS=200, GATE=0.025, HANG=500;  // barge level · sustain · speech-gate level · hangover
+    const BARGE=0.065, BARGE_MS=140, GATE=0.025, HANG=500;  // barge level · sustain · speech-gate level · hangover (lowered so it's easier to talk over the bot)
     let gateOpen=false,lastLoud=0,bargeStart=0;
     convoProc.onaudioprocess=(e)=>{
       if(!convo||!convoWS||convoWS.readyState!==1)return;
@@ -759,7 +911,7 @@ document.getElementById('copymail').addEventListener('click',function(){
       // Low background noise stays below the gate → we send silence → it's never transcribed.
       let sendReal=false;
       if(!botTalking){
-        if(rms>GATE){ gateOpen=true; lastLoud=now; }
+        if(rms>GATE){ if(!gateOpen)userSpeakingNow(); gateOpen=true; lastLoud=now; }  // rising edge → user is talking again, hold the chat closed
         else if(gateOpen&&now-lastLoud>HANG){ gateOpen=false; }
         sendReal=gateOpen;
       }
@@ -772,6 +924,7 @@ document.getElementById('copymail').addEventListener('click',function(){
   }
   function stopConvo(){
     convo=false; wsTries=99;
+    vActive=false; clearTimeout(reopenTimer); reopenTimer=0; hideOrb(); stopAmp();   // tear down the voice-shrink UI
     if(convoProc){try{convoProc.onaudioprocess=null;convoProc.disconnect();}catch(_){}convoProc=null;}
     if(convoMute){try{convoMute.disconnect();}catch(_){}convoMute=null;}
     if(convoCtx){try{convoCtx.close();}catch(_){}convoCtx=null;}
