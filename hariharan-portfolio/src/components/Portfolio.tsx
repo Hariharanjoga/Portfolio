@@ -721,6 +721,7 @@ document.getElementById('copymail').addEventListener('click',function(){
     if(/experience|\brole\b|career|intern|\bjob\b|worked|excelerate|soven|infosys/.test(q))return'experience';
     if(/skill|stack|\btech\b|language|tool|framework|proficien/.test(q))return'skills';
     if(/project|built|portfolio|shipped|\bwork\b/.test(q))return'projects';
+    if(/\bwho\b|about (him|himself|hariharan|you)|tell me about|introduce|overview|summary|\bbio\b|background|strength|strong suit|good at|what does he do|why (should i )?hire|stand ?out|elevator pitch/.test(q))return'about';   // general "who is he / strengths / overview" → whoami section
     return null;
   }
   function send(text,opts){
