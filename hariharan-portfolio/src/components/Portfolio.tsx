@@ -717,9 +717,9 @@ document.getElementById('copymail').addEventListener('click',function(){
     if(/financ|\bsec\b|risk|compliance|filing|\bdocument/.test(q))return'financial';
     if(/testimonial|recommend|reference|review|what.*(say|said)|vouch|feedback/.test(q))return'reports';
     if(/achiev|award|certif|cert\b|finalist|hackathon|\bsih\b|eamcet|leadership|chairperson|accolade|recogni/.test(q))return'credentials';
+    if(/contact|email|reach|reach out|get in touch|\btouch\b|\bhire\b|connect|availab|book|booking|schedule|appointment|meeting|\bcall\b|r[ée]sum[ée]|resume|linkedin|github/.test(q))return'contact';
     if(/experience|\brole\b|career|intern|\bjob\b|worked|excelerate|soven|infosys/.test(q))return'experience';
     if(/skill|stack|\btech\b|language|tool|framework|proficien/.test(q))return'skills';
-    if(/contact|email|reach|\bhire\b|connect|availab|book|call|r[ée]sum[ée]|resume|linkedin|github/.test(q))return'contact';
     if(/project|built|portfolio|shipped|\bwork\b/.test(q))return'projects';
     return null;
   }
@@ -739,12 +739,11 @@ document.getElementById('copymail').addEventListener('click',function(){
     let bubble=null,acc='',spokenUpto=0,firstSpoken=true;
     const ensure=()=>{ if(!bubble){t.remove();bubble=addMsg('bot','');} return bubble; };
     const sayClean=s=>s
-      .replace(/\[(.*?)\]\([^)]*\)/g,'$1')                                            // markdown links → label text
-      .replace(/\bhttps?:\/\/\S+/gi,'the link on screen')                             // don't read full URLs aloud
-      .replace(/\b(?:www\.)?cal\.com\S*/gi,'his booking page')                        // cal.com link/brand → natural phrase
-      .replace(/\s*[,;:—-]?\s*[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,'')  // drop raw email from speech (it's on screen)
-      .replace(/[*_`#>]/g,'').replace(/^\s*[-•]\s+/gm,'')                             // strip markdown marks / bullets
-      .replace(/\s{2,}/g,' ').replace(/\s+([.,!?])/g,'$1').trim();                    // tidy spaces left by removals
+      .replace(/\[(.*?)\]\([^)]*\)/g,'$1')                          // markdown links → label text
+      .replace(/\bhttps?:\/\/\S+/gi,'the link on screen')          // only FULL urls are unreadable aloud
+      .replace(/([A-Za-z0-9._%+-]+)@([A-Za-z0-9.-]+)/g,'$1 at $2') // email: speak "@" as "at" ('.com' stays in-chunk → reads "dot com")
+      .replace(/[*_`#>]/g,'').replace(/^\s*[-•]\s+/gm,'')          // strip markdown marks / bullets
+      .replace(/\s{2,}/g,' ').trim();
     // speak as it streams; the FIRST chunk fires on the first clause (comma) for a fast start, then full sentences
     function flushSpeech(final){
       if(!willSpeak||myGen!==genId)return;
