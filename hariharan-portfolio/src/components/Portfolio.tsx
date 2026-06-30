@@ -588,7 +588,12 @@ document.getElementById('copymail').addEventListener('click',function(){
   // recruiter pastes a job title/description → the chat returns an honest fit read (see /api/chat mode:'fit')
   function looksLikeJD(t){ t=(t||''); return t.length>180 || /responsibilit|requirement|qualificat|we['’]?re looking for|we are looking for|job descript|about the role|nice to have|must[- ]have/i.test(t); }
   // BOOKING (Level 1): open the Cal.com embed modal right on the page — reuses the .book-call embed (no redirect).
-  function openBooking(){ const b=document.querySelector('.book-call'); if(b){ try{b.click();}catch(_){ window.open('https://cal.com/hariharan-joga/15min','_blank','noopener'); } } else { window.open('https://cal.com/hariharan-joga/15min','_blank','noopener'); } }
+  function openBooking(){
+    try{ closeChat(); }catch(_){}   // close the chat drawer + stop voice/convo so the assistant isn't running behind the modal
+    const b=document.querySelector('.book-call');
+    if(b){ try{ b.click(); return; }catch(_){} }
+    window.open('https://cal.com/hariharan-joga/15min','_blank','noopener');
+  }
   function looksLikeBooking(t){ t=(t||'').toLowerCase();
     return /\b(book|schedule|set ?up|arrange|reserve)\b[\s\w]{0,24}\b(call|meeting|chat|demo|slot|time|appointment|session|interview)\b/.test(t)
         || /\b(book it|book now|book a call|book a meeting|book a slot|schedule a call|set up a call|can you book|could you book|i (?:want|wanna|would like|'?d like) to book|let'?s book|go ahead and book|yes,? book)\b/.test(t); }
@@ -740,13 +745,11 @@ document.getElementById('copymail').addEventListener('click',function(){
     addMsg('me',text).textContent=text;
     // BOOKING intent → open the Cal.com modal directly on the page (no LLM round-trip)
     if(!fit && looksLikeBooking(text)){
-      const said="Sure — opening the booking now. Pick any free slot and you're all set.";
-      addMsg('bot','').textContent=said;
-      try{ doFocus('contact'); }catch(_){}
+      addMsg('bot','').textContent="Sure — opening the booking now. Pick any free slot and you're all set 👇";
       const willSpeakB=!!(voiceOn||(opts&&opts.spoken));
-      turnDone=true; if(willSpeakB)speakChunk(said,myGen);
-      busy=false; renderChips(); maybeBotDone();
-      setTimeout(openBooking, willSpeakB?1400:450);   // let the spoken offer start, then pop the modal
+      if(willSpeakB){ try{ speakChunk("Opening the booking now.",myGen); }catch(_){} }   // short spoken cue
+      busy=false; renderChips();
+      setTimeout(openBooking, willSpeakB?1300:420);   // brief cue, then open the modal & close the chat/voice
       return;
     }
     try{ const f=fit?'skills':focusFromText(text); if(f)doFocus(f); }catch(_){}   // fit → show his stack; else scroll to the relevant section
