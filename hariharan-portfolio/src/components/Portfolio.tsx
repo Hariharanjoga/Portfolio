@@ -578,6 +578,8 @@ document.getElementById('copymail').addEventListener('click',function(){
     const wrap=document.createElement('div');wrap.className='chips-wrap';
     const fc=document.createElement('button');fc.type='button';fc.className='chip-q';fc.textContent='📋 Am I a fit for your role?';
     fc.onclick=startFitCheck;wrap.appendChild(fc);                                   // JD fit-check entry point
+    const bk=document.createElement('button');bk.type='button';bk.className='chip-q';bk.textContent='📅 Book a 15-min call';
+    bk.onclick=openBooking;wrap.appendChild(bk);                                     // one-click → opens the Cal.com modal
     suggestions.forEach(s=>{const c=document.createElement('button');c.type='button';c.className='chip-q';c.textContent=s;
       c.onclick=()=>send(s);wrap.appendChild(c);});
     tog.onclick=()=>{ const open=wrap.classList.toggle('open'); tog.classList.toggle('open',open); if(open)setTimeout(()=>{body.scrollTop=body.scrollHeight;},130); };
@@ -585,6 +587,11 @@ document.getElementById('copymail').addEventListener('click',function(){
   }
   // recruiter pastes a job title/description → the chat returns an honest fit read (see /api/chat mode:'fit')
   function looksLikeJD(t){ t=(t||''); return t.length>180 || /responsibilit|requirement|qualificat|we['’]?re looking for|we are looking for|job descript|about the role|nice to have|must[- ]have/i.test(t); }
+  // BOOKING (Level 1): open the Cal.com embed modal right on the page — reuses the .book-call embed (no redirect).
+  function openBooking(){ const b=document.querySelector('.book-call'); if(b){ try{b.click();}catch(_){ window.open('https://cal.com/hariharan-joga/15min','_blank','noopener'); } } else { window.open('https://cal.com/hariharan-joga/15min','_blank','noopener'); } }
+  function looksLikeBooking(t){ t=(t||'').toLowerCase();
+    return /\b(book|schedule|set ?up|arrange|reserve)\b[\s\w]{0,24}\b(call|meeting|chat|demo|slot|time|appointment|session|interview)\b/.test(t)
+        || /\b(book it|book now|book a call|book a meeting|book a slot|schedule a call|set up a call|can you book|could you book|i (?:want|wanna|would like|'?d like) to book|let'?s book|go ahead and book|yes,? book)\b/.test(t); }
   function startFitCheck(){
     pendingFit=true;
     addMsg('bot','').textContent="Sure — paste the role's title or job description and I'll give you an honest fit read.";
@@ -731,6 +738,17 @@ document.getElementById('copymail').addEventListener('click',function(){
     bargeIn();                                  // cancel any in-flight turn + stop all audio (no overlap, ever)
     const myGen=genId; busy=true; chips.innerHTML='';
     addMsg('me',text).textContent=text;
+    // BOOKING intent → open the Cal.com modal directly on the page (no LLM round-trip)
+    if(!fit && looksLikeBooking(text)){
+      const said="Sure — opening the booking now. Pick any free slot and you're all set.";
+      addMsg('bot','').textContent=said;
+      try{ doFocus('contact'); }catch(_){}
+      const willSpeakB=!!(voiceOn||(opts&&opts.spoken));
+      turnDone=true; if(willSpeakB)speakChunk(said,myGen);
+      busy=false; renderChips(); maybeBotDone();
+      setTimeout(openBooking, willSpeakB?1400:450);   // let the spoken offer start, then pop the modal
+      return;
+    }
     try{ const f=fit?'skills':focusFromText(text); if(f)doFocus(f); }catch(_){}   // fit → show his stack; else scroll to the relevant section
     const prior=history.slice();history.push({role:'user',content:text});
     const willSpeak=!!(voiceOn||(opts&&opts.spoken));
