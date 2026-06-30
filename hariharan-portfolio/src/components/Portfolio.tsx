@@ -189,14 +189,6 @@ const MARKUP = `<!-- background -->
   <section id="stack">
     <div class="eyebrow"><span class="idx">04</span> // tech.stack</div>
     <h2 class="section-title reveal">Tools of the trade.</h2>
-    <div class="stack-3d reveal">
-      <div class="stage" id="techStage">
-        <div class="tech-ring" id="techRing"></div>
-        <div class="ribbon-tilt"><div class="tech-ribbon-ring" id="ribbonRing"></div></div>
-      </div>
-      <div class="edge l"></div><div class="edge r"></div>
-    </div>
-    <div class="stack-hint">↺ drag to spin · hover a logo for its name</div>
 
     <div class="skill-cats reveal">
       <div class="skill-cat spec"><div class="sc-key"><i>🤖</i> Agentic AI</div>
@@ -214,6 +206,15 @@ const MARKUP = `<!-- background -->
       <div class="skill-cat"><div class="sc-key"><i>💻</i> Languages</div>
         <div class="sc-chips"><span class="skill-chip">Python</span><span class="skill-chip">C++</span><span class="skill-chip">JavaScript</span><span class="skill-chip">SQL</span><span class="skill-chip">C</span><span class="skill-chip">R</span></div></div>
     </div>
+
+    <div class="stack-3d reveal">
+      <div class="stage" id="techStage">
+        <div class="tech-ring" id="techRing"></div>
+        <div class="ribbon-tilt"><div class="tech-ribbon-ring" id="ribbonRing"></div></div>
+      </div>
+      <div class="edge l"></div><div class="edge r"></div>
+    </div>
+    <div class="stack-hint">↺ drag to spin · hover a logo for its name</div>
   </section>
 
   <!-- FIELD REPORTS (testimonials) -->
@@ -694,9 +695,10 @@ document.getElementById('copymail').addEventListener('click',function(){
   // AI-guided navigation: scroll to + spotlight the section/project the answer is about
   function doFocus(id){
     if(!id||id==='none')return;
-    const sec={about:'#about',projects:'#projects',experience:'#experience',skills:'#stack',reports:'#reports',credentials:'#credentials',contact:'#contact'};
+    const sec={about:'#about',projects:'#projects',experience:'#experience',skills:'.skill-cats',reports:'#reports',credentials:'#credentials',contact:'#contact'};
     const proj={bhumi:'Bhumi','agentic-engine':'Agentic AI Engine','campus-cortex':'Campus Cortex AI','ai-cmo':'AI CMO','edu-tech':'Edu Tech AI',financial:'Financial Risk Analyzer'};
     let el=null,block='start';
+    if(id==='skills')block='center';   // spotlight the categorized skills grid (the photo), not the animation
     if(sec[id])el=document.querySelector(sec[id]);
     else if(proj[id]){ el=[].slice.call(document.querySelectorAll('#projects .card')).find(c=>{const h=c.querySelector('h3');return h&&h.textContent.trim()===proj[id];}); block='center'; }
     if(!el)return;

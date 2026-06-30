@@ -327,7 +327,7 @@
   .chip small{color:var(--muted-2);margin-left:6px}
 
   /* ---------- STACK · 3D circular carousel (drag-spin) + weaving ribbon ---------- */
-  .stack-3d{position:relative;height:470px;margin-top:30px;perspective:1300px;overflow:hidden;user-select:none;touch-action:none}
+  .stack-3d{position:relative;height:470px;margin-top:54px;perspective:1300px;overflow:hidden;user-select:none;touch-action:none}
   .stack-3d .stage{position:absolute;inset:0;transform-style:preserve-3d}
   .tech-ring{position:absolute;left:50%;top:50%;transform-style:preserve-3d;transform:rotateX(9deg)}
   .ribbon-tilt{position:absolute;left:50%;top:50%;transform-style:preserve-3d;transform:rotateX(30deg)}
@@ -353,8 +353,8 @@
   .stack-3d .edge.l{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
   .stack-3d .edge.r{right:0;background:linear-gradient(270deg,var(--bg),transparent)}
   .stack-hint{text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--muted-2);margin-top:10px;letter-spacing:.06em}
-  /* categorized skills — recruiter-scannable list under the carousel */
-  .skill-cats{max-width:940px;margin:50px auto 0;display:flex;flex-direction:column;gap:8px}
+  /* categorized skills — recruiter-scannable list directly under the heading (the animation sits below it) */
+  .skill-cats{max-width:940px;margin:32px auto 0;display:flex;flex-direction:column;gap:8px}
   .skill-cat{display:grid;grid-template-columns:190px 1fr;gap:18px;align-items:center;padding:15px 18px;border:1px solid var(--line);border-radius:12px;background:var(--panel);transition:.25s}
   .skill-cat:hover{border-color:var(--line-strong);background:rgba(34,224,255,0.045)}
   .sc-key{font-family:var(--font-mono);font-size:13.5px;letter-spacing:.04em;color:var(--cyan);display:flex;align-items:center;gap:9px;white-space:nowrap}
