@@ -540,7 +540,7 @@ document.getElementById('copymail').addEventListener('click',function(){
   const chat=document.getElementById('chat'),scrim=document.getElementById('chat-scrim'),
         body=document.getElementById('chat-body'),chips=document.getElementById('chat-chips'),
         form=document.getElementById('chat-form'),input=document.getElementById('chat-input');
-  let greeted=false,busy=false,voiceOn=false,history=[],genId=0,currentAbort=null,pendingFit=false;
+  let greeted=false,busy=false,voiceOn=false,history=[],genId=0,currentAbort=null,pendingFit=false,awaitingFitRole=false;
 
   const suggestions=[
     "What's his strongest project?",
@@ -724,15 +724,42 @@ document.getElementById('copymail').addEventListener('click',function(){
     if(/\bwho\b|about (him|himself|hariharan|you)|tell me about|introduce|overview|summary|\bbio\b|background|strength|strong suit|good at|what does he do|why (should i )?hire|stand ?out|elevator pitch/.test(q))return'about';   // general "who is he / strengths / overview" → whoami section
     return null;
   }
+  // FIT detectors — voice quick-read + proactive recruiter signals.
+  function looksLikeFitIntent(t){ t=(t||'').toLowerCase();
+    return /\b(is|would|will|could|can|are)\b[\s\w']{0,18}\b(a |an |good |strong )?fit\b/.test(t)
+        || /\bfit for\b|\bgood (fit|match)\b|\bright (fit|person|candidate) for\b|\bsuit(ed|able)? (for|to)\b|\bcan he (do|handle|work as|be a)\b|\bis he right for\b/.test(t); }
+  function looksLikeRecruiter(t){ t=(t||'').toLowerCase();
+    return /\bwe(?:'re| are)?\s*(hiring|looking for)\b|\b(i'?m|i am)\s*(a\s*)?(recruiter|hiring manager|hiring)\b/.test(t)
+        || /\b(hiring|open) (role|position)\b|\bfor (my|our) (team|company|startup|role|position)\b|\bjoin (us|our team)\b|\b(we|i) (need|want) (a|an|someone)\b|\blooking for (a|an|someone)\b/.test(t); }
+  function hasRole(t){ t=(t||'').toLowerCase();
+    return /\b(engineer|developer|\bdev\b|scientist|manager|\blead\b|intern|analyst|designer|architect|consultant|researcher|sde|swe|backend|frontend|full ?stack|devops|founding|role of|position of|\bas an?\b|for an?\b)\b/.test(t)
+        || t.trim().split(/\s+/).length>=7; }
   function send(text,opts){
     if(!text.trim())return;
     opts=opts||{};
-    const fit=!!(opts.fit||pendingFit||looksLikeJD(text)); pendingFit=false;   // JD fit-check: chip-triggered, flagged, or auto-detected paste
+    let fit=!!(opts.fit||pendingFit||looksLikeJD(text)); pendingFit=false;   // JD fit-check: chip-triggered, flagged, or auto-detected paste
     if(fit&&input&&!convo)input.placeholder='Type your question…';
     bargeIn();                                  // cancel any in-flight turn + stop all audio (no overlap, ever)
     const myGen=genId; busy=true; chips.innerHTML='';
     addMsg('me',text).textContent=text;
-    try{ const f=fit?'skills':focusFromText(text); if(f)doFocus(f); }catch(_){}   // fit → show his stack; else scroll to the relevant section
+    const spoken=!!(voiceOn||(opts&&opts.spoken));
+    // ---- FIT-CHECK: voice quick-read + proactive on recruiter signals ----
+    if(awaitingFitRole){                                  // we asked "what's the role?" → this reply IS the role
+      awaitingFitRole=false;
+      if(looksLikeJD(text)) fit=true; else if(hasRole(text)) opts=Object.assign({},opts,{fitVoice:true});
+    } else if(!fit && (looksLikeFitIntent(text)||looksLikeRecruiter(text))){
+      if(looksLikeJD(text)) fit=true;                     // full JD pasted with the ask → detailed card
+      else if(hasRole(text)) opts=Object.assign({},opts,{fitVoice:true});  // role given inline → short spoken read
+      else {                                              // bare intent → ask for the role (proactive, voice-friendly)
+        const ask="Happy to gauge his fit. What's the role, and a couple of must-have skills? Or paste the full job description here and I'll give the detailed point-by-point breakdown.";
+        addMsg('bot','').textContent=ask;
+        if(spoken){ try{ speakChunk(ask,myGen); }catch(_){} }
+        awaitingFitRole=true; busy=false; renderChips(); turnDone=true; maybeBotDone();
+        return;
+      }
+    }
+    const fitVoice=!!opts.fitVoice;
+    try{ const f=(fit||fitVoice)?'skills':focusFromText(text); if(f)doFocus(f); }catch(_){}   // fit/fit-voice → show his stack; else scroll to the relevant section
     const prior=history.slice();history.push({role:'user',content:text});
     const willSpeak=!!(voiceOn||(opts&&opts.spoken));
     const ctrl=new AbortController(); currentAbort=ctrl;
@@ -770,7 +797,7 @@ document.getElementById('copymail').addEventListener('click',function(){
       history.push({role:'assistant',content:said}); turnDone=true; flushSpeech(true); maybeBotDone(); };  // turn fully streamed → arm reopen once audio drains
     // stream the live answer from the NVIDIA-backed /api/chat, word-by-word as it's generated
     fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({question:text,history:prior,mode:fit?'fit':undefined}),signal:ctrl.signal})
+        body:JSON.stringify({question:text,history:prior,mode:fitVoice?'fit_voice':(fit?'fit':undefined)}),signal:ctrl.signal})
       .then(r=>{
         if(!r.ok||!r.body) throw 0;
         const reader=r.body.getReader(),dec=new TextDecoder();

@@ -35,6 +35,18 @@ Use ONLY the profile below. No preamble before the verdict line.
 === HARIHARAN PROFILE ===
 ${PROFILE}`;
 
+// Voice fit-check: read ALOUD, so keep it short and conversational — no card, no symbols.
+const FIT_VOICE_SYSTEM = `You assess whether Hariharan Joga fits a role, for a VOICE assistant — your reply is read ALOUD. The user's message is a role title and/or a few requirements.
+
+Reply in 2 to 4 short, natural spoken sentences. NO markdown, NO bullet points, NO symbols (no checkmarks, tildes, asterisks, or hashes).
+- Open with a clear verdict: "Strong fit", "Good fit", "Partial fit", or "Not a strong fit".
+- Give the 1 to 2 strongest reasons tied to his real projects or skills, plus one honest gap if there is one.
+- End by inviting: "If you paste the full job description in the chat, I can give a detailed point-by-point breakdown."
+- NEVER invent skills, tools, employers, or experience. Use ONLY the profile below.
+
+=== HARIHARAN PROFILE ===
+${PROFILE}`;
+
 // Rotate across multiple NVIDIA keys (each free key is ~40 req/min). Round-robin
 // spreads load; on a rate-limit (429) we immediately fail over to the next key.
 const KEYS = [
@@ -88,7 +100,7 @@ async function openStream(messages: Msg[], modelOverride?: string) {
 
 // Fit-checks use a stronger model for better reasoning; fall back to the default if it is unavailable.
 async function getStream(messages: Msg[], mode: string) {
-  if (mode === "fit") {
+  if (mode === "fit" || mode === "fit_voice") {
     const fitModel = process.env.FIT_MODEL || "meta/llama-3.3-70b-instruct";
     try {
       return await openStream(messages, fitModel);
@@ -126,6 +138,8 @@ export async function POST(req: Request) {
     const messages: Msg[] =
       mode === "fit"
         ? [{ role: "system", content: FIT_SYSTEM }, { role: "user", content: question }]
+        : mode === "fit_voice"
+        ? [{ role: "system", content: FIT_VOICE_SYSTEM }, { role: "user", content: question }]
         : [{ role: "system", content: SYSTEM }, ...history, { role: "user", content: question }];
     const stream = await getStream(messages, mode);
 
