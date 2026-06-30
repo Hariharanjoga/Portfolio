@@ -732,8 +732,8 @@ document.getElementById('copymail').addEventListener('click',function(){
     return /\bwe(?:'re| are)?\s*(hiring|looking for)\b|\b(i'?m|i am)\s*(a\s*)?(recruiter|hiring manager|hiring)\b/.test(t)
         || /\b(hiring|open) (role|position)\b|\bfor (my|our) (team|company|startup|role|position)\b|\bjoin (us|our team)\b|\b(we|i) (need|want) (a|an|someone)\b|\blooking for (a|an|someone)\b/.test(t); }
   function hasRole(t){ t=(t||'').toLowerCase();
-    return /\b(engineer|developer|\bdev\b|scientist|manager|\blead\b|intern|analyst|designer|architect|consultant|researcher|sde|swe|backend|frontend|full ?stack|devops|founding|role of|position of|\bas an?\b|for an?\b)\b/.test(t)
-        || t.trim().split(/\s+/).length>=7; }
+    return /\b(engineer|developer|\bdev\b|scientist|manager|\blead\b|intern|analyst|designer|architect|consultant|researcher|sde|swe|backend|frontend|full ?stack|devops|founding|cto|\brole\b|\bposition\b)\b/.test(t)
+        || /\b(agentic|multi-?agent|lang ?graph|lang ?chain|crew ?ai|praison|\brag\b|\bllm\b|\bnlp\b|voice|real-?time|generative|gen ?ai|python|node|react|flask|\bml\b|machine learning|pipeline|chatbot|automation)\b/.test(t); }
   function send(text,opts){
     if(!text.trim())return;
     opts=opts||{};
@@ -775,6 +775,7 @@ document.getElementById('copymail').addEventListener('click',function(){
     // speak as it streams; the FIRST chunk fires on the first clause (comma) for a fast start, then full sentences
     function flushSpeech(final){
       if(!willSpeak||myGen!==genId)return;
+      if(fitVoice&&!final)return;   // fit verdict is short → speak the WHOLE thing once at the end (no chunk gaps / cutoff)
       // '.', '!' or '?' ends a sentence only when followed by whitespace/end — so domains & emails
       // like "gmail.com" / "cal.com" stay in ONE chunk (fixes the detached "com").
       const isEnd=(j)=>{ const c=acc[j]; if(c==='\n')return true;
