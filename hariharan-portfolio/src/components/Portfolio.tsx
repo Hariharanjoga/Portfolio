@@ -587,13 +587,23 @@ document.getElementById('copymail').addEventListener('click',function(){
   }
   // recruiter pastes a job title/description → the chat returns an honest fit read (see /api/chat mode:'fit')
   function looksLikeJD(t){ t=(t||''); return t.length>180 || /responsibilit|requirement|qualificat|we['’]?re looking for|we are looking for|job descript|about the role|nice to have|must[- ]have/i.test(t); }
-  // BOOKING (Level 1): open the Cal.com embed modal right on the page — reuses the .book-call embed (no redirect).
+  // BOOKING (Level 1): open the Cal.com modal on the page (reuses the .book-call embed). The AI stays
+  // ALIVE behind it; we just track whether the modal is open so send() can route around it.
+  let bookingOpen=false, pendingSwitch=null;   // modal open? + a deferred non-booking question awaiting a yes/no
   function openBooking(){
-    try{ closeChat(); }catch(_){}   // close the chat drawer + stop voice/convo so the assistant isn't running behind the modal
+    bookingOpen=true;
     const b=document.querySelector('.book-call');
     if(b){ try{ b.click(); return; }catch(_){} }
     window.open('https://cal.com/hariharan-joga/15min','_blank','noopener');
   }
+  function closeBooking(){
+    bookingOpen=false; pendingSwitch=null;
+    try{ document.querySelectorAll('cal-modal-box').forEach(el=>el.remove()); }catch(_){}     // mimic the X / Esc close
+    try{ document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true})); }catch(_){}
+  }
+  function looksLikeYes(t){ t=(t||'').toLowerCase().trim();
+    return /^(y|ya|yes|yeah|yep|yup|sure|ok|okay|okie|fine|please|pls|go ahead|do it|show me|i want|i need|close it?|close the cal|switch|that one|the info|yes please)\b/.test(t)
+        || /\b(yes|yeah|show me|i want (the|that)|close (it|the cal|cal)|go ahead|do it|switch to|see (it|that))\b/.test(t); }
   function looksLikeBooking(t){ t=(t||'').toLowerCase();
     return /\b(book|schedule|set ?up|arrange|reserve)\b[\s\w]{0,24}\b(call|meeting|chat|demo|slot|time|appointment|session|interview)\b/.test(t)
         || /\b(book it|book now|book a call|book a meeting|book a slot|schedule a call|set up a call|can you book|could you book|i (?:want|wanna|would like|'?d like) to book|let'?s book|go ahead and book|yes,? book)\b/.test(t); }
@@ -742,15 +752,34 @@ document.getElementById('copymail').addEventListener('click',function(){
     if(fit&&input&&!convo)input.placeholder='Type your question…';
     bargeIn();                                  // cancel any in-flight turn + stop all audio (no overlap, ever)
     const myGen=genId; busy=true; chips.innerHTML='';
-    addMsg('me',text).textContent=text;
-    // BOOKING intent → open the Cal.com modal directly on the page (no LLM round-trip)
+    if(!opts.noEcho) addMsg('me',text).textContent=text;
+    const willSpeakB=!!(voiceOn||(opts&&opts.spoken));
+    // (1) A reconfirm is pending → "yes" closes Cal and runs the old flow for the held question
+    if(pendingSwitch){
+      const sw=pendingSwitch; pendingSwitch=null;
+      if(looksLikeYes(text)){ closeBooking(); send(sw.q,Object.assign({},sw.opts,{noEcho:true})); return; }
+      // not a yes → fall through and answer this message normally (Cal stays as-is)
+    }
+    // (2) Explicit booking request → open the Cal modal (AI stays alive behind it)
     if(!fit && looksLikeBooking(text)){
       addMsg('bot','').textContent="Sure — opening the booking now. Pick any free slot and you're all set 👇";
-      const willSpeakB=!!(voiceOn||(opts&&opts.spoken));
       if(willSpeakB){ try{ speakChunk("Opening the booking now.",myGen); }catch(_){} }   // short spoken cue
-      busy=false; renderChips();
-      setTimeout(openBooking, willSpeakB?1300:420);   // brief cue, then open the modal & close the chat/voice
+      busy=false; renderChips(); turnDone=true; maybeBotDone();
+      setTimeout(openBooking, willSpeakB?1300:420);
       return;
+    }
+    // (3) Cal is open + the user asks about a DIFFERENT section → reconfirm before switching away
+    if(bookingOpen && !fit){
+      const topic=focusFromText(text);
+      if(topic && topic!=='contact'){
+        pendingSwitch={q:text,opts:opts};
+        const ask="You've got the booking open — done picking your slot? If you'd like, I can close it and pull that up. Just say yes.";
+        addMsg('bot','').textContent=ask;
+        if(willSpeakB){ try{ speakChunk(ask,myGen); }catch(_){} }
+        busy=false; renderChips(); turnDone=true; maybeBotDone();
+        return;
+      }
+      // otherwise it's a booking/contact/general question → answer normally in the background ↓
     }
     try{ const f=fit?'skills':focusFromText(text); if(f)doFocus(f); }catch(_){}   // fit → show his stack; else scroll to the relevant section
     const prior=history.slice();history.push({role:'user',content:text});
@@ -1187,6 +1216,20 @@ Cal.ns["15min"]("ui", {
     }
   }
 });
+
+// Keep bookingOpen in sync when the modal closes itself (user hits X / Esc / outside click)
+// or a booking succeeds — so send() routes normally again afterwards.
+(function(){
+  try{
+    let seen=false;
+    new MutationObserver(function(){
+      const present=!!document.querySelector('cal-modal-box');
+      if(present){ seen=true; }
+      else if(seen&&bookingOpen){ bookingOpen=false; pendingSwitch=null; seen=false; }
+    }).observe(document.body,{childList:true,subtree:true});
+  }catch(_){}
+  try{ Cal.ns["15min"]("on",{action:"bookingSuccessful",callback:function(){ bookingOpen=false; pendingSwitch=null; }}); }catch(_){}
+})();
 
   }, []);
   return <div dangerouslySetInnerHTML={{ __html: MARKUP }} />;
