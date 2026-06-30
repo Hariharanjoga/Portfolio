@@ -738,14 +738,25 @@ document.getElementById('copymail').addEventListener('click',function(){
     const t=typingBubble();
     let bubble=null,acc='',spokenUpto=0,firstSpoken=true;
     const ensure=()=>{ if(!bubble){t.remove();bubble=addMsg('bot','');} return bubble; };
-    const sayClean=s=>s.replace(/\[(.*?)\]\([^)]*\)/g,'$1').replace(/[*_`#>]/g,'').replace(/^\s*[-•]\s+/gm,'').trim(); // don't read markdown aloud
+    const sayClean=s=>s
+      .replace(/\[(.*?)\]\([^)]*\)/g,'$1')                                            // markdown links → label text
+      .replace(/\bhttps?:\/\/\S+/gi,'the link on screen')                             // don't read full URLs aloud
+      .replace(/\b(?:www\.)?cal\.com\S*/gi,'his booking page')                        // cal.com link/brand → natural phrase
+      .replace(/\s*[,;:—-]?\s*[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,'')  // drop raw email from speech (it's on screen)
+      .replace(/[*_`#>]/g,'').replace(/^\s*[-•]\s+/gm,'')                             // strip markdown marks / bullets
+      .replace(/\s{2,}/g,' ').replace(/\s+([.,!?])/g,'$1').trim();                    // tidy spaces left by removals
     // speak as it streams; the FIRST chunk fires on the first clause (comma) for a fast start, then full sentences
     function flushSpeech(final){
       if(!willSpeak||myGen!==genId)return;
+      // '.', '!' or '?' ends a sentence only when followed by whitespace/end — so domains & emails
+      // like "gmail.com" / "cal.com" stay in ONE chunk (fixes the detached "com").
+      const isEnd=(j)=>{ const c=acc[j]; if(c==='\n')return true;
+        if(c==='.'||c==='!'||c==='?'){ const n=acc[j+1]; return n===undefined?!!final:/\s/.test(n); }
+        return false; };
       let lastB=-1;
-      for(let j=spokenUpto;j<acc.length;j++){ const c=acc[j];
-        if(c==='.'||c==='!'||c==='?'||c==='\n'){ lastB=j; if(firstSpoken)break; }
-        else if(firstSpoken&&c===','&&(j-spokenUpto)>=12){ lastB=j; break; }   // first audio: break on the first real clause so speech starts sooner
+      for(let j=spokenUpto;j<acc.length;j++){
+        if(isEnd(j)){ lastB=j; if(firstSpoken)break; }
+        else if(firstSpoken&&acc[j]===','&&(j-spokenUpto)>=12){ lastB=j; break; }   // first audio: break on the first clause for a fast start
       }
       if(lastB>=spokenUpto){ const chunk=sayClean(acc.slice(spokenUpto,lastB+1)); if(chunk.length>1){speakChunk(chunk,myGen);firstSpoken=false;} spokenUpto=lastB+1; }
       if(final){ const tail=sayClean(acc.slice(spokenUpto)); if(tail.length>1)speakChunk(tail,myGen); spokenUpto=acc.length; }
