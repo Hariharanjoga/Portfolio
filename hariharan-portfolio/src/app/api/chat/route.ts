@@ -101,7 +101,7 @@ async function openStream(messages: Msg[], modelOverride?: string) {
 
 // Fit-checks use a stronger model for better reasoning; fall back to the default if it is unavailable.
 async function getStream(messages: Msg[], mode: string) {
-  if (mode === "fit" || mode === "fit_voice") {
+  if (mode === "fit") {   // detailed pasted-JD card → stronger model. Voice quick-read (fit_voice) uses the FAST default below.
     const fitModel = process.env.FIT_MODEL || "meta/llama-3.3-70b-instruct";
     try {
       return await openStream(messages, fitModel);
