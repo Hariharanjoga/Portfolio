@@ -31,6 +31,14 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
+        {/* Google Analytics (GA4) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-H833VPJ1EM" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-H833VPJ1EM');",
+          }}
+        />
       </head>
       <body suppressHydrationWarning>{children}</body>
     </html>
