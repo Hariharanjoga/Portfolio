@@ -731,9 +731,11 @@ document.getElementById('copymail').addEventListener('click',function(){
   function looksLikeRecruiter(t){ t=(t||'').toLowerCase();
     return /\bwe(?:'re| are)?\s*(hiring|looking for)\b|\b(i'?m|i am)\s*(a\s*)?(recruiter|hiring manager|hiring)\b/.test(t)
         || /\b(hiring|open) (role|position)\b|\bfor (my|our) (team|company|startup|role|position)\b|\bjoin (us|our team)\b|\b(we|i) (need|want) (a|an|someone)\b|\blooking for (a|an|someone)\b/.test(t); }
-  function hasRole(t){ t=(t||'').toLowerCase();
-    return /\b(engineer|developer|\bdev\b|scientist|manager|\blead\b|intern|analyst|designer|architect|consultant|researcher|sde|swe|backend|frontend|full ?stack|devops|founding|cto|\brole\b|\bposition\b)\b/.test(t)
-        || /\b(agentic|multi-?agent|lang ?graph|lang ?chain|crew ?ai|praison|\brag\b|\bllm\b|\bnlp\b|voice|real-?time|generative|gen ?ai|python|node|react|flask|\bml\b|machine learning|pipeline|chatbot|automation)\b/.test(t); }
+  function hasRoleWord(t){ t=(t||'').toLowerCase();
+    return /\b(engineer|developer|\bdev\b|scientist|manager|\blead\b|intern|analyst|designer|architect|consultant|researcher|sde|swe|backend|frontend|full ?stack|devops|founding|cto|\brole\b|\bposition\b|\bjob\b)\b/.test(t); }
+  function hasSkillWord(t){ t=(t||'').toLowerCase();
+    return /\b(agentic|multi-?agent|lang ?graph|lang ?chain|crew ?ai|praison|\brag\b|\bllm\b|\bnlp\b|voice|real-?time|generative|gen ?ai|python|node|react|flask|postgres|mongo|pinecone|redis|docker|aws|gcp|azure|\bml\b|machine learning|pipeline|chatbot|automation|kubernetes|ci\/?cd|typescript|\bjava\b|\bgo\b|rust)\b/.test(t); }
+  function fitDetailEnough(t){ return looksLikeJD(t) || (hasRoleWord(t)&&hasSkillWord(t)) || (t||'').trim().split(/\s+/).length>=12; }
   // trivial "are you there?" check-in — only meaningful while a turn is already in flight
   function looksLikeAreYouThere(t){ t=(t||'').toLowerCase().trim();
     return /^(hello|hi|hey|yo|hola)\??$/.test(t)
@@ -755,15 +757,16 @@ document.getElementById('copymail').addEventListener('click',function(){
     const myGen=genId; busy=true; chips.innerHTML='';
     addMsg('me',text).textContent=text;
     const spoken=!!(voiceOn||(opts&&opts.spoken));
-    // ---- FIT-CHECK: voice quick-read + proactive on recruiter signals ----
-    if(awaitingFitRole){                                  // we asked "what's the role?" → this reply IS the role
+    // ---- FIT-CHECK: ask for role + must-haves first, then a persuasive read (voice + proactive) ----
+    if(awaitingFitRole){                                  // we already asked → this reply is their role/requirements
       awaitingFitRole=false;
-      if(looksLikeJD(text)) fit=true; else if(hasRole(text)) opts=Object.assign({},opts,{fitVoice:true});
+      if(looksLikeJD(text)) fit=true;
+      else if(hasRoleWord(text)||hasSkillWord(text)||!focusFromText(text)) opts=Object.assign({},opts,{fitVoice:true});
+      // else (clearly a different-topic question) → fall through to a normal answer
     } else if(!fit && (looksLikeFitIntent(text)||looksLikeRecruiter(text))){
-      if(looksLikeJD(text)) fit=true;                     // full JD pasted with the ask → detailed card
-      else if(hasRole(text)) opts=Object.assign({},opts,{fitVoice:true});  // role given inline → short spoken read
-      else {                                              // bare intent → ask for the role (proactive, voice-friendly)
-        const ask="Happy to gauge his fit. What's the role, and a couple of must-have skills? Or paste the full job description here and I'll give the detailed point-by-point breakdown.";
+      if(fitDetailEnough(text)){ if(looksLikeJD(text)) fit=true; else opts=Object.assign({},opts,{fitVoice:true}); }  // role + a requirement (or full JD) → read now
+      else {                                              // not enough → ask 1–2 questions + offer the JD
+        const ask="Sure — what's the role, and one or two must-have skills? Or if you've got the full job description, paste it here and I'll give a detailed point-by-point breakdown.";
         addMsg('bot','').textContent=ask;
         if(spoken){ try{ speakChunk(ask,myGen); }catch(_){} }
         awaitingFitRole=true; busy=false; renderChips(); turnDone=true; maybeBotDone();
@@ -783,6 +786,8 @@ document.getElementById('copymail').addEventListener('click',function(){
       .replace(/\[(.*?)\]\([^)]*\)/g,'$1')                          // markdown links → label text
       .replace(/\bhttps?:\/\/\S+/gi,'the link on screen')          // only FULL urls are unreadable aloud
       .replace(/([A-Za-z0-9._%+-]+)@([A-Za-z0-9.-]+)/g,'$1 at $2') // email: speak "@" as "at" ('.com' stays in-chunk → reads "dot com")
+      .replace(/((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z.]*\s*)?(\d{4})\s*[–—-]\s*(present|current|now|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z.]*\s*\d{4})/gi,'$1$2 to $3') // date ranges: "Feb 2026 – Present" → "Feb 2026 to Present"
+      .replace(/\s*→\s*/g,' onward ')                              // "2018 →" → "2018 onward"
       .replace(/[*_`#>]/g,'').replace(/^\s*[-•]\s+/gm,'')          // strip markdown marks / bullets
       .replace(/\s{2,}/g,' ').trim();
     // speak as it streams; the FIRST chunk fires on the first clause (comma) for a fast start, then full sentences
