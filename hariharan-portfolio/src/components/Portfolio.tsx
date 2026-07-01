@@ -734,9 +734,21 @@ document.getElementById('copymail').addEventListener('click',function(){
   function hasRole(t){ t=(t||'').toLowerCase();
     return /\b(engineer|developer|\bdev\b|scientist|manager|\blead\b|intern|analyst|designer|architect|consultant|researcher|sde|swe|backend|frontend|full ?stack|devops|founding|cto|\brole\b|\bposition\b)\b/.test(t)
         || /\b(agentic|multi-?agent|lang ?graph|lang ?chain|crew ?ai|praison|\brag\b|\bllm\b|\bnlp\b|voice|real-?time|generative|gen ?ai|python|node|react|flask|\bml\b|machine learning|pipeline|chatbot|automation)\b/.test(t); }
+  // trivial "are you there?" check-in — only meaningful while a turn is already in flight
+  function looksLikeAreYouThere(t){ t=(t||'').toLowerCase().trim();
+    return /^(hello|hi|hey|yo|hola)\??$/.test(t)
+        || /\b(are you (there|here|listening|awake|working|ok)|you (there|here|listening)|still (there|here|with me)|can you hear me|u there)\b/.test(t); }
   function send(text,opts){
     if(!text.trim())return;
     opts=opts||{};
+    // Check-in ("you there?") while an answer is still generating → reassure WITHOUT aborting the pending turn
+    if(busy && !opts.fit && !pendingFit && looksLikeAreYouThere(text)){
+      addMsg('me',text).textContent=text;
+      const ln="Still here — just putting that together.";
+      addMsg('bot','').textContent=ln;
+      if(voiceOn||(opts&&opts.spoken)){ try{ speakChunk(ln,genId); }catch(_){} }
+      return;
+    }
     let fit=!!(opts.fit||pendingFit||looksLikeJD(text)); pendingFit=false;   // JD fit-check: chip-triggered, flagged, or auto-detected paste
     if(fit&&input&&!convo)input.placeholder='Type your question…';
     bargeIn();                                  // cancel any in-flight turn + stop all audio (no overlap, ever)
@@ -762,6 +774,7 @@ document.getElementById('copymail').addEventListener('click',function(){
     try{ const f=(fit||fitVoice)?'skills':focusFromText(text); if(f)doFocus(f); }catch(_){}   // fit/fit-voice → show his stack; else scroll to the relevant section
     const prior=history.slice();history.push({role:'user',content:text});
     const willSpeak=!!(voiceOn||(opts&&opts.spoken));
+    if((fit||fitVoice)&&willSpeak){ const fills=["Good question — let me pull that together.","One sec, weighing that up.","Let me think on that for a moment.","Alright, sizing that up now."]; try{ speakChunk(fills[Math.floor(Math.random()*fills.length)],myGen); }catch(_){} }   // filler so there's no dead air while the slower fit model thinks
     const ctrl=new AbortController(); currentAbort=ctrl;
     const t=typingBubble();
     let bubble=null,acc='',spokenUpto=0,firstSpoken=true;

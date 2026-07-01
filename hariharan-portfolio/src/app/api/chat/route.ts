@@ -124,7 +124,7 @@ export async function POST(req: Request) {
 
     const rawHistory = Array.isArray(body.history) ? (body.history as unknown[]) : [];
     const history: Msg[] = rawHistory
-      .slice(-6)
+      .slice(-10)
       .map((m) => {
         const mm = m as { role?: unknown; content?: unknown };
         return {
@@ -138,9 +138,9 @@ export async function POST(req: Request) {
 
     const messages: Msg[] =
       mode === "fit"
-        ? [{ role: "system", content: FIT_SYSTEM }, { role: "user", content: question }]
+        ? [{ role: "system", content: FIT_SYSTEM }, ...history, { role: "user", content: question }]
         : mode === "fit_voice"
-        ? [{ role: "system", content: FIT_VOICE_SYSTEM }, { role: "user", content: question }]
+        ? [{ role: "system", content: FIT_VOICE_SYSTEM }, ...history, { role: "user", content: question }]
         : [{ role: "system", content: SYSTEM }, ...history, { role: "user", content: question }];
     const stream = await getStream(messages, mode);
 
