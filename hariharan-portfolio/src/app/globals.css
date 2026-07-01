@@ -327,7 +327,7 @@
   .chip small{color:var(--muted-2);margin-left:6px}
 
   /* ---------- STACK · 3D circular carousel (drag-spin) + weaving ribbon ---------- */
-  .stack-3d{position:relative;height:470px;margin-top:54px;perspective:1300px;overflow:hidden;user-select:none;touch-action:none}
+  .stack-3d{position:relative;height:470px;margin-top:54px;perspective:1300px;overflow:hidden;user-select:none;touch-action:pan-y}
   .stack-3d .stage{position:absolute;inset:0;transform-style:preserve-3d}
   .tech-ring{position:absolute;left:50%;top:50%;transform-style:preserve-3d;transform:rotateX(9deg)}
   .ribbon-tilt{position:absolute;left:50%;top:50%;transform-style:preserve-3d;transform:rotateX(30deg)}
@@ -690,3 +690,90 @@
   #chat-scrim{position:fixed;inset:0;z-index:790;background:rgba(3,5,9,0.55);backdrop-filter:blur(2px);
     opacity:0;pointer-events:none;transition:.4s}
   #chat-scrim.open{opacity:1;pointer-events:auto}
+
+  /* ============================================================
+     MOBILE OPTIMISATION — app-style bottom tab bar + responsive fixes
+     ============================================================ */
+
+  /* app-style bottom tab bar — hidden on desktop, shown ≤880px */
+  .mobile-tabs{display:none}
+
+  @media(max-width:880px){
+    /* prevent iOS text inflation + horizontal scroll */
+    html{-webkit-text-size-adjust:100%}
+    html,body{max-width:100%;overflow-x:hidden}
+
+    /* keep all page content clear of the fixed bottom bar */
+    body{padding-bottom:calc(66px + env(safe-area-inset-bottom))}
+
+    /* header: safe-area aware + tighter */
+    header{padding:calc(10px + env(safe-area-inset-top)) 16px 10px}
+
+    /* the floating fab is replaced by the centre orb in the tab bar */
+    .fab-dock{display:none}
+
+    .mobile-tabs{
+      display:flex;position:fixed;left:0;right:0;bottom:0;z-index:830;
+      align-items:flex-end;justify-content:space-around;gap:2px;
+      padding:7px 8px calc(7px + env(safe-area-inset-bottom));
+      background:linear-gradient(180deg,rgba(6,10,16,0.80),rgba(5,7,11,0.98));
+      border-top:1px solid var(--line-strong);backdrop-filter:blur(16px);
+      box-shadow:0 -10px 34px -20px rgba(0,0,0,0.95)}
+    .mtab{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;
+      padding:6px 2px;color:var(--muted);font-family:var(--font-mono);border-radius:10px;
+      transition:color .2s,transform .2s;-webkit-tap-highlight-color:transparent}
+    .mtab .mt-ic{font-size:19px;line-height:1;transition:.2s}
+    .mtab .mt-lbl{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+    .mtab.active{color:var(--cyan)}
+    .mtab.active .mt-ic{filter:drop-shadow(0 0 8px rgba(34,224,255,.7));transform:translateY(-1px)}
+    .mtab:active{transform:scale(.94)}
+    /* raised centre Ask-AI orb — the star action */
+    .mtab-ask{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:5px;
+      background:none;border:0;cursor:pointer;margin:0 4px;transform:translateY(-16px);
+      -webkit-tap-highlight-color:transparent}
+    .mtab-ask .ma-orb{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;position:relative;
+      background:linear-gradient(135deg,var(--cyan),#1aa9ff);
+      box-shadow:0 12px 28px -6px rgba(34,224,255,.7),0 0 0 5px rgba(5,7,11,.92)}
+    .mtab-ask .ma-orb i{width:13px;height:13px;border-radius:50%;background:#04121a;font-style:normal;
+      animation:pulse 1.6s ease-in-out infinite}
+    .mtab-ask .ma-orb::after{content:'';position:absolute;inset:-5px;border-radius:50%;
+      border:1.5px solid rgba(34,224,255,.5);animation:ring 2s ease-out infinite}
+    .mtab-ask:active .ma-orb{transform:scale(.94)}
+    .mtab-ask .mt-lbl{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--cyan)}
+    /* the full-screen chat drawer must sit ABOVE the bar; hide the bar while chatting */
+    body.chat-open .mobile-tabs{display:none}
+
+    /* section rhythm: tighter padding on phones */
+    section{padding:88px 18px 34px}
+    #hero{padding-top:92px}
+    footer{padding:22px 18px 30px}
+
+    /* ---- kill horizontal overflow in the hero ---- */
+    #hero>div{min-width:0;max-width:100%}
+    .hero-tag{display:flex;flex-wrap:wrap;max-width:100%;font-size:11px;letter-spacing:.06em;
+      line-height:1.5;margin-bottom:14px}
+    .role{max-width:100%;overflow-wrap:anywhere}
+    .lede{font-size:15.5px;margin:18px 0 24px}
+    .stat-row{gap:16px;margin-top:26px}
+    .stat .num{font-size:26px}
+
+    /* hero Ask panel: stack the row so the Speak button never clips off-screen */
+    .askpanel form{flex-wrap:wrap}
+    .askpanel input{flex:1 1 100%;min-width:0;padding:6px 4px}
+    .askpanel .go,.askpanel .speak{flex:1 1 auto;justify-content:center}
+  }
+
+  /* stop iOS auto-zoom on input focus (any field <16px triggers it) */
+  @media(max-width:880px){
+    .chat-input input,.cf-row input,.cf-row textarea,.askpanel input,.askpanel .go,
+    .askbar input,.pal-in input,#palinput{font-size:16px}
+  }
+
+  /* finer typography + decluttering on small phones */
+  @media(max-width:600px){
+    .brand small{display:none}
+    .hud-right{gap:10px}
+    .stat-row{justify-content:space-between;gap:12px}
+    .stat{flex:1 1 auto}
+    .cta-row .btn{flex:1 1 auto;justify-content:center}
+  }

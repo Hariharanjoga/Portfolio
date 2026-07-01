@@ -1,5 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+
+// viewport-fit=cover lets the layout use env(safe-area-inset-*) so the bottom
+// tab bar and header sit clear of the notch / home-indicator on phones.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#05070b",
+};
 
 export const metadata: Metadata = {
   title: "Hariharan Joga — Agentic, Generative & Voice AI Engineer",

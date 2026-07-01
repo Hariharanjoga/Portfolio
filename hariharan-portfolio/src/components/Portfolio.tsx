@@ -318,6 +318,15 @@ const MARKUP = `<!-- background -->
   <button class="ask-fab" id="ask-fab"><span class="orb"><i></i></span><span>ASK&nbsp;AI</span></button>
 </div>
 
+<!-- app-style bottom tab bar (mobile only · shown ≤880px) -->
+<nav class="mobile-tabs" id="mtabs" aria-label="Section navigation">
+  <a class="mtab" href="#projects" data-sec="projects"><span class="mt-ic">▤</span><span class="mt-lbl">work</span></a>
+  <a class="mtab" href="#experience" data-sec="experience"><span class="mt-ic">◲</span><span class="mt-lbl">career</span></a>
+  <button type="button" class="mtab-ask" id="mtab-ask" aria-label="Ask my AI"><span class="ma-orb"><i></i></span><span class="mt-lbl">ask ai</span></button>
+  <a class="mtab" href="#stack" data-sec="stack"><span class="mt-ic">⬡</span><span class="mt-lbl">stack</span></a>
+  <a class="mtab" href="#contact" data-sec="contact"><span class="mt-ic">✉</span><span class="mt-lbl">contact</span></a>
+</nav>
+
 <!-- spotlight overlay: dims the page around the AI-focused section -->
 <div id="spotlight"></div>
 
@@ -650,12 +659,14 @@ document.getElementById('copymail').addEventListener('click',function(){
   function placeOrb(){
     if(!vorb)return;
     const vw=window.innerWidth, vh=window.innerHeight, R=(vorb.offsetWidth||150)/2, pad=22, lbl=30;
-    let ox=vw/2, oy=vh-R-pad-lbl;                                  // default: bottom-centre
+    const barH=window.matchMedia('(max-width:880px)').matches?78:0;  // keep the orb above the mobile bottom bar
+    const floor=vh-barH;
+    let ox=vw/2, oy=floor-R-pad-lbl;                               // default: bottom-centre (above the bar on mobile)
     if(spotEl){
       const r=spotEl.getBoundingClientRect();
-      if(r.bottom+pad+R*2+lbl < vh) oy=r.bottom+pad+R;            // room below the element → sit under it
+      if(r.bottom+pad+R*2+lbl < floor) oy=r.bottom+pad+R;         // room below the element → sit under it
       else if(r.top-pad-R > pad) oy=r.top-pad-R;                  // else tuck above it
-      else oy=vh-R-pad-lbl;                                       // else fall back to the bottom
+      else oy=floor-R-pad-lbl;                                    // else fall back to the bottom
       ox=Math.min(Math.max(r.left+r.width/2, R+pad), vw-R-pad);   // centre on the element, clamped on-screen
     }
     vorb.style.setProperty('--ox',ox+'px'); vorb.style.setProperty('--oy',oy+'px');
@@ -834,6 +845,7 @@ document.getElementById('copymail').addEventListener('click',function(){
   function openChat(prefill,opts){
     opts=opts||{};
     chat.classList.add('open');
+    document.body.classList.add('chat-open');                      // hides the mobile bottom bar while chatting
     if(DESKTOP())pushPage(true); else scrim.classList.add('open'); // desktop shrinks the page to fit; mobile dims it
     if(prefill){greeted=true;setTimeout(()=>send(prefill),420);return;}
     if(!greeted){greeted=true;
@@ -842,10 +854,11 @@ document.getElementById('copymail').addEventListener('click',function(){
       setTimeout(()=>{t.remove();const b=addMsg('bot','');stream(b,GREETING,renderChips);},480);
     }else{setTimeout(()=>input.focus(),420);if(opts.afterGreet)opts.afterGreet();}
   }
-  function closeChat(){chat.classList.remove('open');scrim.classList.remove('open');pushPage(false);spotlightOff();stopConvo();}
+  function closeChat(){chat.classList.remove('open');document.body.classList.remove('chat-open');scrim.classList.remove('open');pushPage(false);spotlightOff();stopConvo();}
   window.__openChat=openChat;
 
   document.getElementById('ask-fab').addEventListener('click',()=>openChat());
+  const mAsk=document.getElementById('mtab-ask'); if(mAsk)mAsk.addEventListener('click',()=>openChat());   // mobile bottom-bar centre orb
   document.getElementById('chat-close').addEventListener('click',closeChat);
   scrim.addEventListener('click',closeChat);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeChat();});
@@ -1017,12 +1030,16 @@ document.getElementById('copymail').addEventListener('click',function(){
 
 /* ---------- nav scroll-spy (lights the active item's style) ---------- */
 (function(){
-  const links=[...document.querySelectorAll('nav a[href^="#"]')];
+  const links=[...document.querySelectorAll('header nav a[href^="#"]')];
   const map={};links.forEach(a=>map[a.getAttribute('href').slice(1)]=a);
+  const mtabs=[...document.querySelectorAll('.mtab[href^="#"]')];          // mobile bottom-bar tabs
+  const mmap={};mtabs.forEach(a=>mmap[a.getAttribute('href').slice(1)]=a);
   const io=new IntersectionObserver(es=>{
     es.forEach(e=>{if(e.isIntersecting){
       links.forEach(l=>l.classList.remove('active'));
       const a=map[e.target.id];if(a)a.classList.add('active');
+      mtabs.forEach(l=>l.classList.remove('active'));
+      const b=mmap[e.target.id];if(b)b.classList.add('active');            // light the matching bottom tab in sync
     }});
   },{rootMargin:'-45% 0px -50% 0px'});
   ['about','projects','experience','stack','contact'].forEach(id=>{const s=document.getElementById(id);if(s)io.observe(s);});
@@ -1115,7 +1132,13 @@ document.getElementById('copymail').addEventListener('click',function(){
     tRX=-ny*7;    // up/down movement — noticeable but not wild
     tRY=nx*18;    // cursor left/right → tilt left/right
   });
+  let onScreen=true;                                                    // skip the expensive style writes while the stack is off-screen (saves battery/CPU on mobile)
+  if(root&&'IntersectionObserver'in window){
+    new IntersectionObserver(es=>{ if(es[0])onScreen=es[0].isIntersecting; },{threshold:0}).observe(root);
+  }
   (function frame(){
+    requestAnimationFrame(frame);                                       // always alive; the work below is gated so restart is never needed
+    if(!onScreen)return;                                                // offscreen → skip the 18 transform writes + layout (the costly part)
     if(!dragging){vel*=0.94; spin+=(hotCount>0?auto*0.12:auto)+vel;}   // outer ring slows while a logo is hovered
     cRX+=(tRX-cRX)*0.08; cRY+=(tRY-cRY)*0.08;                            // smooth-follow the pointer
     if(stage)stage.style.transform='scale(1.28) rotateX('+cRX+'deg) rotateY('+cRY+'deg)';  // zoomed up
@@ -1125,7 +1148,6 @@ document.getElementById('copymail').addEventListener('click',function(){
       o.cur+=(target-o.cur)*0.16;
       o.el.style.transform='rotateY('+a+'deg) translateZ('+o.R+'px) translateY('+o.y+'px) scale('+o.cur+')';
     }
-    requestAnimationFrame(frame);
   })();
 
   // inner ribbon: ONE smooth white cylinder band — a tile per character, edge-to-edge (no chunky word-cards)
