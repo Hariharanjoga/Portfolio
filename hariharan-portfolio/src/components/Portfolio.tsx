@@ -938,7 +938,7 @@ document.getElementById('copymail').addEventListener('click',function(){
       if(!token){ if(wsTries++<4){ setTimeout(openSTTSocket,200); } else if(input){ input.placeholder='Voice unavailable — tap mic to retry'; } return; }
       const fmt=PCM_FMT[convoSR]||'pcm_16000';
       const url='wss://api.elevenlabs.io/v1/speech-to-text/realtime?model_id=scribe_v2_realtime&audio_format='+fmt
-        +'&commit_strategy=vad&vad_silence_threshold_secs=0.6&vad_threshold=0.5&min_speech_duration_ms=250&token='+encodeURIComponent(token);
+        +'&commit_strategy=vad&vad_silence_threshold_secs=1.3&vad_threshold=0.5&min_speech_duration_ms=250&token='+encodeURIComponent(token);   // (A) 1.3s silence before committing → you can pause mid-sentence without being cut off (was 0.6s)
       const ws=new WebSocket(url); convoWS=ws;
       ws.onopen=()=>{ wsTries=0; prefetchToken(); console.log('[voice] STT socket open ('+fmt+')'); };   // pre-mint the next token now
       ws.onmessage=(ev)=>{ let m; try{m=JSON.parse(ev.data);}catch(_){return;}
@@ -967,7 +967,7 @@ document.getElementById('copymail').addEventListener('click',function(){
     convoProc=convoCtx.createScriptProcessor(2048,1,1);
     convoMute=convoCtx.createGain(); convoMute.gain.value=0;
     srcN.connect(convoProc); convoProc.connect(convoMute); convoMute.connect(convoCtx.destination);
-    const BARGE=0.065, BARGE_MS=140, GATE=0.025, HANG=500;  // barge level · sustain · speech-gate level · hangover (lowered so it's easier to talk over the bot)
+    const BARGE=0.065, BARGE_MS=140, GATE=0.025, HANG=1000;  // barge level · sustain · speech-gate level · hangover. (B) 1000ms hangover keeps your audio streaming through mid-sentence pauses so no fake silence is sent (gate still only OPENS on real speech, so noise stays blocked)
     let gateOpen=false,lastLoud=0,bargeStart=0;
     convoProc.onaudioprocess=(e)=>{
       if(!convo||!convoWS||convoWS.readyState!==1)return;
