@@ -827,7 +827,7 @@ document.getElementById('copymail').addEventListener('click',function(){
       history.push({role:'assistant',content:said}); turnDone=true; flushSpeech(true); maybeBotDone(); };  // turn fully streamed → arm reopen once audio drains
     // stream the live answer from the NVIDIA-backed /api/chat, word-by-word as it's generated
     fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({question:text,history:prior,mode:fitVoice?'fit_voice':(fit?'fit':undefined)}),signal:ctrl.signal})
+        body:JSON.stringify({question:text,history:prior,mode:fitVoice?'fit_voice':(fit?'fit':(spoken?'voice':undefined))}),signal:ctrl.signal})
       .then(r=>{
         if(!r.ok||!r.body) throw 0;
         const reader=r.body.getReader(),dec=new TextDecoder();

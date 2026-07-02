@@ -48,6 +48,20 @@ Reply in 2 to 4 short, natural, confident spoken sentences. NO markdown, NO bull
 === HARIHARAN PROFILE ===
 ${PROFILE}`;
 
+// Voice mode: a spoken answer read ALOUD to a (usually) recruiter. Must be SHORT — nobody listens to a monologue.
+const VOICE_SYSTEM = `You are the voice assistant on Hariharan Joga's portfolio. Your reply is spoken ALOUD to a recruiter, so it MUST be short and punchy.
+
+Rules:
+- Answer ONLY from the profile below. Speak about him in the third person ("he", "his").
+- Keep it to 1–2 short spoken sentences, about 40 words MAX. Plain conversational speech — NO markdown, lists, symbols, or headers.
+- Lead with the single most relevant point. Do NOT enumerate everything. Even for broad questions ("what has he built"), give ONE headline highlight, then invite: "want me to go deeper on any of them?"
+- Warm, confident, recruiter-friendly. If they want more detail, they'll ask — keep the door open instead of dumping it all at once.
+- Contact asks: "he can book a quick 15-minute call, or email him at hariharanjoga445@gmail.com."
+- If the profile doesn't cover it, say so briefly and point them to a call or his email. Never invent facts, dates, numbers, employers, or projects.
+
+=== HARIHARAN PROFILE ===
+${PROFILE}`;
+
 // Rotate across multiple NVIDIA keys (each free key is ~40 req/min). Round-robin
 // spreads load; on a rate-limit (429) we immediately fail over to the next key.
 const KEYS = [
@@ -72,7 +86,7 @@ function rateLimited(ip: string): boolean {
 type Msg = { role: "system" | "user" | "assistant"; content: string };
 
 // Try keys in rotation; on 429 / 5xx, immediately move to the next key.
-async function openStream(messages: Msg[], modelOverride?: string) {
+async function openStream(messages: Msg[], modelOverride?: string, maxTokens = 600) {
   const model = modelOverride || process.env.CHAT_MODEL || "meta/llama-3.1-8b-instruct";
   const n = KEYS.length;
   let lastErr: unknown;
@@ -83,7 +97,7 @@ async function openStream(messages: Msg[], modelOverride?: string) {
       const stream = await client.chat.completions.create({
         model,
         temperature: 0.4,
-        max_tokens: 600,
+        max_tokens: maxTokens,
         stream: true,
         messages,
       });
@@ -109,6 +123,7 @@ async function getStream(messages: Msg[], mode: string) {
       return await openStream(messages);
     }
   }
+  if (mode === "voice") return openStream(messages, undefined, 200);   // spoken → concise; hard token cap backs up the short-answer prompt
   return openStream(messages);
 }
 
@@ -141,6 +156,8 @@ export async function POST(req: Request) {
         ? [{ role: "system", content: FIT_SYSTEM }, ...history, { role: "user", content: question }]
         : mode === "fit_voice"
         ? [{ role: "system", content: FIT_VOICE_SYSTEM }, ...history, { role: "user", content: question }]
+        : mode === "voice"
+        ? [{ role: "system", content: VOICE_SYSTEM }, ...history, { role: "user", content: question }]
         : [{ role: "system", content: SYSTEM }, ...history, { role: "user", content: question }];
     const stream = await getStream(messages, mode);
 
