@@ -858,7 +858,7 @@ document.getElementById('copymail').addEventListener('click',function(){
   window.__openChat=openChat;
 
   document.getElementById('ask-fab').addEventListener('click',()=>openChat());
-  const mAsk=document.getElementById('mtab-ask'); if(mAsk)mAsk.addEventListener('click',()=>openChat());   // mobile bottom-bar centre orb
+  const mAsk=document.getElementById('mtab-ask'); if(mAsk)mAsk.addEventListener('click',()=>voiceStart());   // mobile bottom-bar centre orb → full voice: opens chat AND requests the mic (so the allow/decline prompt shows)
   document.getElementById('chat-close').addEventListener('click',closeChat);
   scrim.addEventListener('click',closeChat);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeChat();});
