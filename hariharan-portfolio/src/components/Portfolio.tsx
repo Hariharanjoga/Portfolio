@@ -346,7 +346,7 @@ const MARKUP = `<!-- background -->
     <div class="meta"><b>ASK HARIHARAN</b><small><i></i> NEURAL_LINK ONLINE</small></div>
     <div class="x" id="chat-close">✕</div>
   </div>
-  <div class="chat-tag">// grounded on my résumé + projects · 🎤 voice enabled · <b>powered by NVIDIA</b></div>
+  <div class="chat-tag">// grounded on my résumé + projects · 🎤 voice enabled · <b>powered by Azure OpenAI</b></div>
   <div class="chat-body" id="chat-body"></div>
   <div class="chips" id="chat-chips"></div>
   <form class="chat-input" id="chat-form">
