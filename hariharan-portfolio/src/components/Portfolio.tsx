@@ -788,7 +788,12 @@ document.getElementById('copymail').addEventListener('click',function(){
     try{ const f=(fit||fitVoice)?'skills':focusFromText(text); if(f)doFocus(f); }catch(_){}   // fit/fit-voice → show his stack; else scroll to the relevant section
     const prior=history.slice();history.push({role:'user',content:text});
     const willSpeak=!!(voiceOn||(opts&&opts.spoken));
-    if((fit||fitVoice)&&willSpeak){ const fills=["Good question — let me pull that together.","One sec, weighing that up.","Let me think on that for a moment.","Alright, sizing that up now."]; try{ speakChunk(fills[Math.floor(Math.random()*fills.length)],myGen); }catch(_){} }   // filler so there's no dead air while the slower fit model thinks
+    if(willSpeak){   // filler on EVERY spoken turn (not just fit) — masks the STT-commit → LLM → TTS round trip so it never feels like dead air
+      const fitFills=["Good question — let me pull that together.","One sec, weighing that up.","Let me think on that for a moment.","Alright, sizing that up now."];
+      const genFills=["Let me think on that for a sec.","One moment.","Good question — let me pull that up.","Just a second."];
+      const fills=(fit||fitVoice)?fitFills:genFills;
+      try{ speakChunk(fills[Math.floor(Math.random()*fills.length)],myGen); }catch(_){}
+    }
     const ctrl=new AbortController(); currentAbort=ctrl;
     const t=typingBubble();
     let bubble=null,acc='',spokenUpto=0,firstSpoken=true;
