@@ -549,7 +549,7 @@ document.getElementById('copymail').addEventListener('click',function(){
   const chat=document.getElementById('chat'),scrim=document.getElementById('chat-scrim'),
         body=document.getElementById('chat-body'),chips=document.getElementById('chat-chips'),
         form=document.getElementById('chat-form'),input=document.getElementById('chat-input');
-  let greeted=false,busy=false,voiceOn=false,history=[],genId=0,currentAbort=null,pendingFit=false,awaitingFitRole=false;
+  let greeted=false,busy=false,voiceOn=false,history=[],genId=0,currentAbort=null,pendingFit=false,awaitingFitRole=false,lastSpokenNormQ='';
 
   const suggestions=[
     "What's his strongest project?",
@@ -762,6 +762,13 @@ document.getElementById('copymail').addEventListener('click',function(){
       if(voiceOn||(opts&&opts.spoken)){ try{ speakChunk(ln,genId); }catch(_){} }
       return;
     }
+    // Duplicate re-ask while the previous SPOKEN turn is still in flight → ignore it. Prevents "double-talk":
+    // user thinks it didn't hear (slow), repeats the same question, and both answers end up stacking up.
+    // Only blocks while still busy — once the turn finishes, an identical re-ask is allowed again.
+    const _spoken=!!(voiceOn||(opts&&opts.spoken));
+    const _nq=text.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+    if(_spoken && busy && _nq && _nq===lastSpokenNormQ) return;
+    if(_spoken) lastSpokenNormQ=_nq;
     let fit=!!(opts.fit||pendingFit||looksLikeJD(text)); pendingFit=false;   // JD fit-check: chip-triggered, flagged, or auto-detected paste
     if(fit&&input&&!convo)input.placeholder='Type your question…';
     bargeIn();                                  // cancel any in-flight turn + stop all audio (no overlap, ever)
@@ -788,11 +795,15 @@ document.getElementById('copymail').addEventListener('click',function(){
     try{ const f=(fit||fitVoice)?'skills':focusFromText(text); if(f)doFocus(f); }catch(_){}   // fit/fit-voice → show his stack; else scroll to the relevant section
     const prior=history.slice();history.push({role:'user',content:text});
     const willSpeak=!!(voiceOn||(opts&&opts.spoken));
-    if(willSpeak){   // filler on EVERY spoken turn (not just fit) — masks the STT-commit → LLM → TTS round trip so it never feels like dead air
-      const fitFills=["Good question — let me pull that together.","One sec, weighing that up.","Let me think on that for a moment.","Alright, sizing that up now."];
-      const genFills=["Let me think on that for a sec.","One moment.","Good question — let me pull that up.","Just a second."];
-      const fills=(fit||fitVoice)?fitFills:genFills;
-      try{ speakChunk(fills[Math.floor(Math.random()*fills.length)],myGen); }catch(_){}
+    if(willSpeak){   // instant acknowledgment on EVERY spoken turn so there's never dead air
+      try{
+        if(!speakFiller(myGen)){   // cache not ready yet (rare — e.g. very first turn) → fall back to a network-fetched filler
+          const fitFills=["Good question — let me pull that together.","One sec, weighing that up.","Let me think on that for a moment.","Alright, sizing that up now."];
+          const genFills=["Let me think on that for a sec.","One moment.","Good question — let me pull that up.","Just a second."];
+          const fills=(fit||fitVoice)?fitFills:genFills;
+          speakChunk(fills[Math.floor(Math.random()*fills.length)],myGen);
+        }
+      }catch(_){}
     }
     const ctrl=new AbortController(); currentAbort=ctrl;
     const t=typingBubble();
@@ -901,11 +912,12 @@ document.getElementById('copymail').addEventListener('click',function(){
   // barge-in: cancel any in-flight chat fetch, stop all audio, and bump the generation so
   // stale streamed text / queued TTS from the old turn can never play over a new one.
   function bargeIn(){ if(currentAbort){try{currentAbort.abort();}catch(_){}currentAbort=null;} genId++; stopSpeak(); ttsChain=Promise.resolve(); busy=false; ttsPending=0; stopAmp(); }
-  function speakChunk(text,gen){
+  function speakChunk(text,gen,cachedBlob){
     if(!text||!text.trim()||gen!==genId)return;
     ttsPending++;                                        // track in-flight audio so we know when the bot is fully done
-    const p=fetch('/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text})})
-      .then(r=>r.ok?r.blob():null).catch(()=>null);
+    const p=cachedBlob?Promise.resolve(cachedBlob)       // pre-fetched filler → plays instantly, no network round-trip
+      :fetch('/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text})})
+        .then(r=>r.ok?r.blob():null).catch(()=>null);
     ttsChain=ttsChain.then(()=>p).then(blob=>new Promise(res=>{
       if(gen!==genId||!blob){ ttsPending--; maybeBotDone(); res(); return; }   // a newer turn started → skip this audio
       const url=URL.createObjectURL(blob);const a=new Audio(url);curAudio=a;
@@ -928,6 +940,18 @@ document.getElementById('copymail').addEventListener('click',function(){
       a.play().catch(()=>{ browserSpeak(GREETING); done(); });
     } else { browserSpeak(GREETING); done(); }
   }
+
+  // Instant-acknowledgment fillers: pre-fetched ONCE when voice starts, so on a spoken turn one
+  // plays with ZERO network delay — the user hears "let me think" immediately (not after a 4G
+  // round-trip) and so doesn't assume it failed and repeat the question (which caused double-talk).
+  const FILLERS=["Let me think on that for a sec.","One moment.","Good question, let me pull that up.","Just a second.","Alright, one sec."];
+  let fillerBlobs=[];
+  function prewarmFillers(){ if(fillerBlobs.length)return;
+    FILLERS.forEach(txt=>{ fetch('/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:txt})})
+      .then(r=>r.ok?r.blob():null).then(b=>{ if(b)fillerBlobs.push(b); }).catch(()=>{}); }); }
+  function speakFiller(gen){                            // play a random pre-fetched filler instantly; false if cache not ready yet
+    if(!fillerBlobs.length)return false;
+    speakChunk('filler',gen,fillerBlobs[Math.floor(Math.random()*fillerBlobs.length)]); return true; }
 
   // continuous voice conversation via ElevenLabs realtime streaming STT (WebSocket).
   // Audio streams to ElevenLabs as you speak, so the transcript is ready the instant you stop —
@@ -968,6 +992,7 @@ document.getElementById('copymail').addEventListener('click',function(){
   }
   async function startConvo(){
     if(convo||!canRecord)return false;
+    prewarmFillers();                                         // fetch the instant-ack filler clips now, while the greeting plays
     ensureTTSCtx(); try{ttsCtx&&ttsCtx.resume();}catch(_){}   // warm the playback ctx on this gesture so orb audio-reactivity is unlocked
     try{ convoStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}); }
     catch(_){ if(input){input.placeholder='Mic blocked — allow access';setTimeout(()=>setMic('off'),2600);} return false; }
