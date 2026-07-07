@@ -830,22 +830,32 @@ document.getElementById('copymail').addEventListener('click',function(){
     const finishLive=()=>{ if(myGen!==genId)return; busy=false;renderChips();const said=acc.trim();
       if(fit)ensure().innerHTML=formatFit(acc);                                      // final formatted fit card
       history.push({role:'assistant',content:said}); turnDone=true; flushSpeech(true); maybeBotDone(); };  // turn fully streamed → arm reopen once audio drains
-    // stream the live answer from the NVIDIA-backed /api/chat, word-by-word as it's generated
-    fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({question:text,history:prior,mode:fitVoice?'fit_voice':(fit?'fit':(spoken?'voice':undefined))}),signal:ctrl.signal})
+    // stream the live answer from the NVIDIA-backed /api/chat, word-by-word as it's generated.
+    // A transient mobile network blip can kill the stream before the FIRST byte arrives → rather
+    // than immediately showing an error, silently retry once (the filler audio covers the gap).
+    // Only retry when nothing has streamed yet (acc empty); a mid-stream drop keeps the partial answer.
+    const reqBody=JSON.stringify({question:text,history:prior,mode:fitVoice?'fit_voice':(fit?'fit':(spoken?'voice':undefined))});
+    let attempts=0;
+    function onFail(){ if(myGen!==genId)return;
+      if(!acc.trim() && attempts<2){ setTimeout(()=>{ if(myGen===genId)runStream(); },450); return; }   // nothing arrived → one silent retry
+      fallback(); }
+    function runStream(){ attempts++;
+      fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:reqBody,signal:ctrl.signal})
       .then(r=>{
         if(!r.ok||!r.body) throw 0;
         const reader=r.body.getReader(),dec=new TextDecoder();
         (function pump(){ reader.read().then(function(res){
           if(myGen!==genId)return;                 // superseded by a newer question → stop silently
-          if(res.done){ acc.trim()?finishLive():fallback(); return; }
+          if(res.done){ acc.trim()?finishLive():onFail(); return; }
           acc+=dec.decode(res.value,{stream:true});
           if(fit)ensure().innerHTML=formatFit(acc);else ensure().textContent=acc;   // fit → formatted card, else plain streaming
           body.scrollTop=body.scrollHeight; flushSpeech(false);
           pump();
-        }).catch(function(){ if(myGen!==genId)return; acc.trim()?finishLive():fallback(); }); })();
+        }).catch(function(){ if(myGen!==genId)return; acc.trim()?finishLive():onFail(); }); })();
       })
-      .catch(()=>{ if(myGen!==genId)return; fallback(); });
+      .catch(()=>{ onFail(); });
+    }
+    runStream();
   }
   function openChat(prefill,opts){
     opts=opts||{};

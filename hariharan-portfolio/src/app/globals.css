@@ -728,22 +728,22 @@
     .mtab.active{color:var(--cyan)}
     .mtab.active .mt-ic{filter:drop-shadow(0 0 8px rgba(34,224,255,.7));transform:translateY(-1px)}
     .mtab:active{transform:scale(.94)}
-    /* raised centre Ask-AI orb — taken OUT of the flex flow (position:absolute) so its tall
-       content (54px orb + label) never inflates .mobile-tabs' height and leaves dead space
-       above the shorter side tabs; the 4 remaining .mtab items (space-around) naturally leave
-       a gap at dead-center for it to float over */
-    .mtab-ask{position:absolute;left:50%;bottom:0;transform:translate(-50%,-16px);
-      display:flex;flex-direction:column;align-items:center;gap:5px;
-      background:none;border:0;cursor:pointer;
-      -webkit-tap-highlight-color:transparent}
-    .mtab-ask .ma-orb{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;position:relative;
+    /* centre Ask-AI orb: a NORMAL equal-width column (flex:1, same as the 4 .mtab items) so all
+       5 slots are evenly spaced and consistent. The orb VISUAL is position:absolute WITHIN this
+       column and raised, so it never inflates the bar height and never crowds its neighbours;
+       the "ask ai" label stays in flow at the bottom, aligned with the other tab labels. */
+    .mtab-ask{flex:1;min-width:0;position:relative;display:flex;flex-direction:column;
+      align-items:center;justify-content:flex-end;gap:4px;padding:6px 2px;
+      background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+    .mtab-ask .ma-orb{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);
+      width:54px;height:54px;border-radius:50%;display:grid;place-items:center;
       background:linear-gradient(135deg,var(--cyan),#1aa9ff);
-      box-shadow:0 12px 28px -6px rgba(34,224,255,.7),0 0 0 5px rgba(5,7,11,.92)}
+      box-shadow:0 12px 28px -6px rgba(34,224,255,.7),0 0 0 6px var(--bg)}
     .mtab-ask .ma-orb i{width:13px;height:13px;border-radius:50%;background:#04121a;font-style:normal;
       animation:pulse 1.6s ease-in-out infinite}
     .mtab-ask .ma-orb::after{content:'';position:absolute;inset:-5px;border-radius:50%;
       border:1.5px solid rgba(34,224,255,.5);animation:ring 2s ease-out infinite}
-    .mtab-ask:active .ma-orb{transform:scale(.94)}
+    .mtab-ask:active .ma-orb{transform:translateX(-50%) scale(.94)}
     .mtab-ask .mt-lbl{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--cyan)}
     /* the full-screen chat drawer must sit ABOVE the bar; hide the bar while chatting */
     body.chat-open .mobile-tabs{display:none}
