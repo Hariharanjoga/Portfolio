@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { PROFILE } from "@/lib/profile";
+import { limit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -78,16 +79,6 @@ const KEYS = [
 
 let cursor = 0; // round-robin position across KEYS
 
-// Lightweight per-IP rate limit to protect the public endpoint.
-const hits = new Map<string, number[]>();
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  const recent = (hits.get(ip) || []).filter((t) => now - t < 60_000);
-  recent.push(now);
-  hits.set(ip, recent);
-  return recent.length > 30; // 30 req/min/IP
-}
-
 type Msg = { role: "system" | "user" | "assistant"; content: string };
 
 // Try keys in rotation; on 429 / 5xx, immediately move to the next key.
@@ -134,8 +125,8 @@ async function getStream(messages: Msg[], mode: string) {
 
 export async function POST(req: Request) {
   try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
-    if (rateLimited(ip)) return Response.json({ error: "rate_limited" }, { status: 429 });
+    const limited = limit(req, 30); // 30 req/min per real client IP
+    if (limited) return limited;
 
     const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
     const mode = String(body.mode || "").trim();

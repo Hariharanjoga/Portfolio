@@ -1,4 +1,6 @@
 // Text-to-speech via ElevenLabs Flash v2.5 (~75ms, best-in-class English).
+import { limit } from "@/lib/rateLimit";
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -9,6 +11,9 @@ const SPEED = Number(process.env.VOICE_SPEED || "1.1"); // brisk pace so the cal
 
 export async function POST(req: Request) {
   try {
+    const limited = limit(req, 20); // 20 req/min per client IP — paid ElevenLabs call (voice chunks it)
+    if (limited) return limited;
+
     const body = (await req.json().catch(() => ({}))) as { text?: unknown };
     const text = String(body.text || "").slice(0, 1500).trim();
     if (!text) return Response.json({ error: "no_text" }, { status: 400 });

@@ -1,3 +1,5 @@
+import { limit } from "@/lib/rateLimit";
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -5,7 +7,10 @@ const KEY = process.env.ELEVEN_API_KEY || process.env.ELEVENLABS_API_KEY || "";
 
 // Mints a short-lived single-use token so the browser can stream audio straight to the
 // ElevenLabs realtime STT WebSocket without exposing the API key. Token expires in 15 min.
-export async function GET() {
+export async function GET(req: Request) {
+  const limited = limit(req, 8); // 8 tokens/min per client IP — each is a paid realtime session
+  if (limited) return limited;
+
   if (!KEY) return Response.json({ error: "no_key" }, { status: 503 });
   try {
     const mod = await import("@elevenlabs/elevenlabs-js");

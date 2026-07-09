@@ -1,10 +1,14 @@
 import { Resend } from "resend";
+import { limit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
+    const limited = limit(req, 5); // 5 msgs/min per client IP — sends real email
+    if (limited) return limited;
+
     const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
 
     // Honeypot — bots fill hidden fields; humans don't.

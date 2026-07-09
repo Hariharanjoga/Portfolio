@@ -1,4 +1,6 @@
 // Speech-to-text via ElevenLabs Scribe (most accurate English STT; covers Hindi/Telugu too).
+import { limit } from "@/lib/rateLimit";
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -7,6 +9,9 @@ const STT_MODEL = process.env.ELEVEN_STT_MODEL || "scribe_v1";
 
 export async function POST(req: Request) {
   try {
+    const limited = limit(req, 20); // 20 req/min per client IP — paid ElevenLabs call
+    if (limited) return limited;
+
     if (!KEY) return Response.json({ error: "no_key" }, { status: 503 });
 
     const inForm = await req.formData().catch(() => null);
