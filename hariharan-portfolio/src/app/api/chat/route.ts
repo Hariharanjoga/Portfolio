@@ -79,28 +79,32 @@ const KEYS = [
 
 let cursor = 0; // round-robin position across KEYS
 
+// Hard ceiling on the model call. If the provider stalls (e.g. free-tier throttling that
+// hangs the connection), we abort and return a graceful fallback instead of freezing the
+// request for 25s. Normal first-token latency is well under 1s.
+const MODEL_TIMEOUT_MS = Number(process.env.MODEL_TIMEOUT_MS || "9000");
+
 type Msg = { role: "system" | "user" | "assistant"; content: string };
 
-// Try keys in rotation; on 429 / 5xx, immediately move to the next key.
-async function openStream(messages: Msg[], modelOverride?: string, maxTokens = 600) {
+// Try keys in rotation; on 429 / 5xx, immediately move to the next key. `signal` aborts a
+// stalled upstream (timeout or client disconnect).
+async function openStream(messages: Msg[], modelOverride: string | undefined, maxTokens: number, signal: AbortSignal) {
   const model = modelOverride || process.env.CHAT_MODEL || "meta/llama-3.1-8b-instruct";
   const n = KEYS.length;
   let lastErr: unknown;
   for (let i = 0; i < n; i++) {
     const key = KEYS[(cursor + i) % n];
     try {
-      const client = new OpenAI({ apiKey: key, baseURL: BASE_URL });
-      const stream = await client.chat.completions.create({
-        model,
-        temperature: 0.4,
-        max_tokens: maxTokens,
-        stream: true,
-        messages,
-      });
+      const client = new OpenAI({ apiKey: key, baseURL: BASE_URL, maxRetries: 0, timeout: MODEL_TIMEOUT_MS });
+      const stream = await client.chat.completions.create(
+        { model, temperature: 0.4, max_tokens: maxTokens, stream: true, messages },
+        { signal },
+      );
       cursor = (cursor + i + 1) % n; // advance so the next request starts on a fresh key
       return stream;
     } catch (err) {
       lastErr = err;
+      if (signal.aborted) throw err; // timed out / client gone — don't burn time on more keys
       const status = (err as { status?: number })?.status;
       if (status === 429 || status === 500 || status === 502 || status === 503) continue;
       throw err;
@@ -110,17 +114,18 @@ async function openStream(messages: Msg[], modelOverride?: string, maxTokens = 6
 }
 
 // Fit-checks use a stronger model for better reasoning; fall back to the default if it is unavailable.
-async function getStream(messages: Msg[], mode: string) {
+async function getStream(messages: Msg[], mode: string, signal: AbortSignal) {
   if (mode === "fit") {   // detailed pasted-JD card → stronger model. Voice quick-read (fit_voice) uses the FAST default below.
     const fitModel = process.env.FIT_MODEL || "meta/llama-3.3-70b-instruct";
     try {
-      return await openStream(messages, fitModel);
-    } catch {
-      return await openStream(messages);
+      return await openStream(messages, fitModel, 600, signal);
+    } catch (err) {
+      if (signal.aborted) throw err;
+      return await openStream(messages, undefined, 600, signal);
     }
   }
-  if (mode === "voice") return openStream(messages, undefined, 200);   // spoken → concise; hard token cap backs up the short-answer prompt
-  return openStream(messages);
+  if (mode === "voice") return openStream(messages, undefined, 200, signal);   // spoken → concise; hard token cap backs up the short-answer prompt
+  return openStream(messages, undefined, 600, signal);
 }
 
 export async function POST(req: Request) {
@@ -159,22 +164,50 @@ export async function POST(req: Request) {
         : mode === "voice"
         ? [{ role: "system", content: VOICE_SYSTEM }, ...history, { role: "user", content: question }]
         : [{ role: "system", content: SYSTEM }, ...history, { role: "user", content: question }];
-    const stream = await getStream(messages, mode);
+
+    // Abort the upstream if it stalls past the ceiling OR if the client disconnects.
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), MODEL_TIMEOUT_MS);
+
+    let stream: Awaited<ReturnType<typeof getStream>>;
+    try {
+      stream = await getStream(messages, mode, ac.signal);
+    } catch (err) {
+      clearTimeout(timer);
+      console.error("/api/chat model unavailable:", err instanceof Error ? err.message : err);
+      // Graceful fallback — a short spoken-friendly line so the user is never left hanging.
+      const spoken = mode === "voice" || mode === "fit_voice";
+      const fb = spoken
+        ? "Sorry, I'm getting a lot of requests right now. Give me a few seconds and ask me again."
+        : "Sorry — I'm handling a lot of requests right now and couldn't get to that in time. Please ask again in a few seconds.";
+      return new Response(fb, {
+        headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
+      });
+    }
 
     // Pipe model deltas straight to the client as plain-text chunks → instant first token.
     const encoder = new TextEncoder();
     const rs = new ReadableStream<Uint8Array>({
       async start(controller) {
         try {
+          let first = true;
           for await (const chunk of stream) {
+            if (first) { first = false; clearTimeout(timer); } // tokens flowing → cancel the abort timer
             const piece = chunk.choices?.[0]?.delta?.content || "";
             if (piece) controller.enqueue(encoder.encode(piece));
           }
         } catch (err) {
           console.error("/api/chat stream error:", err instanceof Error ? err.message : err);
         } finally {
+          clearTimeout(timer);
           controller.close();
         }
+      },
+      cancel() {
+        // Client navigated away mid-answer — abort the upstream model call so the connection
+        // is released instead of leaking (leaked streams degraded the process under load).
+        clearTimeout(timer);
+        ac.abort();
       },
     });
 
