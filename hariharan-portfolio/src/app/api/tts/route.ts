@@ -4,7 +4,8 @@ export const dynamic = "force-dynamic";
 
 const KEY = process.env.ELEVEN_API_KEY || process.env.ELEVENLABS_API_KEY || "";
 const MODEL = process.env.ELEVEN_MODEL || "eleven_flash_v2_5";
-const VOICE = process.env.VOICE_ID || "OtEfb2LVzIE45wdYe54M";
+const VOICE = process.env.VOICE_ID || "VbDz3QQGkAGePVWfkfwE"; // Anant — male, Indian, energetic
+const SPEED = Number(process.env.VOICE_SPEED || "1.1"); // brisk pace so the calm voice doesn't drag
 
 export async function POST(req: Request) {
   try {
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         text,
         model_id: MODEL,
-        voice_settings: { stability: 0.5, similarity_boost: 0.8, use_speaker_boost: true },
+        voice_settings: { stability: 0.5, similarity_boost: 0.8, use_speaker_boost: true, speed: SPEED },
       }),
     });
 
