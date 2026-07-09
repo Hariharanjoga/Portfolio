@@ -1,4 +1,0 @@
-200 200 200 200 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 502 
-
-35 reqs (unique spoofed XFF, one real IP) → {"200":4,"502":31}
-RESULT: FAIL — 0×429. Limiter not tripping from one real IP; needs investigation.
