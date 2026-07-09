@@ -21,15 +21,14 @@ export async function GET(req: Request) {
     const token =
       typeof res === "string" ? res : res?.token ?? res?.value ?? res?.singleUseToken ?? "";
     if (!token) {
-      return Response.json(
-        { error: "no_token", shape: res && typeof res === "object" ? Object.keys(res) : typeof res },
-        { status: 502 },
-      );
+      // Log internal shape server-side only; don't leak it to the client.
+      console.error("/api/stt-token: no token in upstream response", res && typeof res === "object" ? Object.keys(res) : typeof res);
+      return Response.json({ error: "token_failed" }, { status: 502 });
     }
     return Response.json({ token });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error("/api/stt-token error:", msg);
-    return Response.json({ error: "token_failed", detail: msg }, { status: 500 });
+    console.error("/api/stt-token error:", msg); // log detail server-side, don't return it
+    return Response.json({ error: "token_failed" }, { status: 500 });
   }
 }

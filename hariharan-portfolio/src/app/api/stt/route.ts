@@ -19,6 +19,13 @@ export async function POST(req: Request) {
     if (!file || typeof file === "string") {
       return Response.json({ error: "no_audio" }, { status: 400 });
     }
+    // Bound the upload before spending an ElevenLabs call on it: cap size and require audio.
+    if (file.size > 2_000_000) {
+      return Response.json({ error: "too_large" }, { status: 413 });
+    }
+    if (file.type && !file.type.startsWith("audio/")) {
+      return Response.json({ error: "bad_type" }, { status: 415 });
+    }
 
     const out = new FormData();
     out.append("file", file);
