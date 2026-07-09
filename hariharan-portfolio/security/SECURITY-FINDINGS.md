@@ -14,17 +14,25 @@ The scary one people worry about — *"the AI leaks an API key if you ask clever
 
 The real exposure is **money and abuse**: four API endpoints have **no rate limiting at all**, and the one endpoint that does can be **bypassed with a single spoofed header**. Both are confirmed on production. Plus the site ships **no security headers**.
 
-| # | Finding | Severity | Confirmed |
-|---|---------|----------|-----------|
-| 1 | No rate limiting on `/api/tts`, `/api/stt`, `/api/stt-token`, `/api/contact` | **HIGH** | ✅ local + prod |
-| 2 | Chat rate-limiter bypassed via `X-Forwarded-For` spoofing | **HIGH** | ✅ prod (35 spoofed → 0×429) |
-| 3 | No security headers (HSTS/CSP/X-Frame-Options/etc.) | **MEDIUM** | ✅ prod |
-| 4 | LLM prompt-injection: off-topic abuse + system-prompt/profile extraction | **MEDIUM** | ✅ local |
-| 5 | Unbounded in-memory rate-limit map (memory-exhaustion DoS) | **MEDIUM** | ✅ code |
-| 6 | `/api/stt` accepts uploads with no size/type limit | **LOW-MED** | ✅ code |
-| 7 | Version-disclosure headers (`Server`, `X-Powered-By`) | **LOW** | ✅ prod |
-| 8 | `/api/stt-token` 502 path leaks internal object keys | **INFO** | ✅ code |
-| 9 | Occasional LLM fabrication under pressure | **LOW** | ✅ local |
+| # | Finding | Severity | Confirmed | Status |
+|---|---------|----------|-----------|--------|
+| 1 | No rate limiting on `/api/tts`, `/api/stt`, `/api/stt-token`, `/api/contact` | **HIGH** | ✅ local + prod | ✅ **FIXED** (Batch 1) |
+| 2 | Chat rate-limiter bypassed via `X-Forwarded-For` spoofing | **HIGH** | ✅ prod (35 spoofed → 0×429) | ✅ **FIXED** (Batch 1) |
+| 3 | No security headers (HSTS/CSP/X-Frame-Options/etc.) | **MEDIUM** | ✅ prod | ✅ **FIXED** (Batch 2) |
+| 4 | LLM prompt-injection: off-topic abuse + system-prompt/profile extraction | **MEDIUM** | ✅ local | ⏳ Batch 3 (pending model recovery) |
+| 5 | Unbounded in-memory rate-limit map (memory-exhaustion DoS) | **MEDIUM** | ✅ code | ✅ **FIXED** (Batch 1) |
+| 6 | `/api/stt` accepts uploads with no size/type limit | **LOW-MED** | ✅ code | ✅ **FIXED** (Batch 4) |
+| 7 | Version-disclosure headers (`Server`, `X-Powered-By`) | **LOW** | ✅ prod | ✅ **FIXED** (Batch 2) |
+| 8 | `/api/stt-token` 502 path leaks internal object keys | **INFO** | ✅ code | ✅ **FIXED** (Batch 4) |
+| 9 | Occasional LLM fabrication under pressure | **LOW** | ✅ local | ⏳ Batch 3 (pending model recovery) |
+| 10 | Model call could hang ~25s with no timeout (reliability + DoS amplifier) | **MEDIUM** | ✅ prod (during testing) | ✅ **FIXED** (timeout + graceful fallback + abort-on-disconnect) |
+
+### Remediation log — 2026-07-09
+- **Batch 1** (`5cabff6`): shared per-route/per-IP limiter (`src/lib/rateLimit.ts`, bounded + self-pruning), reads non-spoofable `X-Real-IP`; limits — chat 30, tts/stt 20, stt-token 8, contact 5 per min; nginx `limit_req` flood backstop. Verified on prod (`stt-token`: 8×200 → 429).
+- **Resilience** (`a92e061`): 9s model-call ceiling → graceful fallback message; `AbortController` fires on timeout **and** client disconnect (fixes a connection-leak that degraded the process under load). Verified on prod.
+- **Batch 2** (`5b485e3`): security headers (HSTS, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy with `microphone=(self)`), CSP **Report-Only** scoped to real sources, `poweredByHeader:false`; nginx `server_tokens off`. Verified on prod.
+- **Batch 4** (`e642cd4`): `/api/stt` size (2 MB → 413) + type (non-audio → 415) caps; `/api/stt-token` generic errors. Verified on prod (415).
+- **Batch 3** (pending): LLM prompt hardening — blocked on NVIDIA free-tier throttle recovery (needs a live model to red-team the fix).
 
 ### What already passes (don't touch)
 - ✅ **No API key or secret ever leaked** through the AI, even under direct extraction, roleplay, base64, and forged-history attacks.
