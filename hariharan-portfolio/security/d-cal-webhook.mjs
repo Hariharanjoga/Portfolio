@@ -64,4 +64,9 @@ head("TRACK D — Cal.com → WhatsApp webhook (DRY_RUN)");
   ((r.json.params || [])[3] === "—" ? pass : fail)(`missing note → "${(r.json.params||[])[3]}" (expect —)`);
 }
 
-info("dedupe test lives in Task 2");
+// 5. dedupe: same uid twice → second is deduped
+{
+  const a = await post(sample("bk_dupe"));
+  const b = await post(sample("bk_dupe"));
+  (a.status === 200 && b.json.deduped === true ? pass : fail)(`same uid twice → first ${a.status}, second deduped=${b.json.deduped}`);
+}

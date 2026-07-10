@@ -4,6 +4,18 @@ import { verifyCalSignature, extractBooking, sendBookingAlert } from "@/lib/calW
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// In-memory dedupe of recently-seen booking uids (Cal retries on slow responses).
+const seenUids = new Map<string, number>();
+const DEDUPE_TTL_MS = 10 * 60_000;
+function alreadyHandled(uid: string): boolean {
+  if (!uid) return false;
+  const now = Date.now();
+  for (const [k, t] of seenUids) if (now - t > DEDUPE_TTL_MS) seenUids.delete(k);
+  if (seenUids.has(uid)) return true;
+  seenUids.set(uid, now);
+  return false;
+}
+
 export async function POST(req: Request) {
   try {
     const limited = limit(req, 60);
@@ -25,6 +37,8 @@ export async function POST(req: Request) {
     }
 
     const fields = extractBooking(evt.payload || {});
+    if (alreadyHandled(fields.uid)) return Response.json({ ok: true, deduped: true });
+
     const result = await sendBookingAlert(fields);
     if (!result.ok) console.error("/api/cal-webhook whatsapp send failed:", result.status, result.body);
 
