@@ -40,6 +40,16 @@ head("Security headers (GET /)");
   };
   for (const [k, why] of Object.entries(want)) {
     const v = h.get(k);
+    if (k === "content-security-policy") {
+      // CSP is deployed in Report-Only mode (monitoring, not enforcing) so a bad policy can't
+      // break GTM/ElevenLabs/Cal.com. Treat report-only as present-but-not-enforcing (WARN),
+      // only FAIL if NEITHER header exists.
+      const ro = h.get("content-security-policy-report-only");
+      if (v) pass(`${k}: ${v}`);
+      else if (ro) warn(`${k}: not enforcing — deployed as Report-Only (monitoring): ${ro.slice(0, 60)}…`);
+      else fail(`${k}: MISSING — ${why}`);
+      continue;
+    }
     (v ? pass : fail)(`${k}: ${v || `MISSING — ${why}`}`);
   }
   // leaky headers
@@ -89,11 +99,16 @@ head("CORS");
 }
 
 // --- THE KEY PROD TEST: does the XFF rate-limit bypass survive nginx? ---
-head("XFF rate-limit bypass on PRODUCTION (35 spoofed IPs, capped)");
+// The app checks the rate limiter BEFORE it runs the model, so a payload that the input guard
+// short-circuits (e.g. "process.env") exercises the exact same limiter path at ZERO model cost.
+// Default stays "hi" for an honest end-to-end probe; set SEC_BYPASS_Q=process.env to spare a
+// metered model key when re-running after a deploy.
+const BYPASS_Q = process.env.SEC_BYPASS_Q || "hi";
+head(`XFF rate-limit bypass on PRODUCTION (35 spoofed IPs, capped; q="${BYPASS_Q}")`);
 {
   const codes = [];
   for (let i = 0; i < 35; i++) {
-    const res = await postJSON(`${PROD}/api/chat`, { question: "hi", mode: "" }, { "x-forwarded-for": `45.33.${i}.${(i * 7) % 255}` });
+    const res = await postJSON(`${PROD}/api/chat`, { question: BYPASS_Q, mode: "" }, { "x-forwarded-for": `45.33.${i}.${(i * 7) % 255}` });
     codes.push(res.status);
   }
   const tally = codes.reduce((m, c) => ((m[c] = (m[c] || 0) + 1), m), {});

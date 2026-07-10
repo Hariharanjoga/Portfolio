@@ -72,16 +72,23 @@ head("Chat rate-limiter — fixed IP");
   (n429 > 0 ? pass : warn)(`${CHAT_BURST} reqs from ONE IP → ${JSON.stringify(r.tally)}  ${n429 ? `limiter tripped (${n429}×429) ✓` : "limiter never tripped?!"}`);
 }
 
-// --- 3. THE BYPASS: unique spoofed X-Forwarded-For per request → limiter defeated ---
-head("Chat rate-limiter — X-Forwarded-For spoof bypass");
+// --- 3. XFF spoof must be NEUTRALIZED once X-Real-IP is authoritative (as nginx sets in prod) ---
+// The old bug: identity came from the client-spoofable X-Forwarded-For, so a unique XFF per
+// request defeated the limiter. The fix reads X-Real-IP first (nginx overwrites it from
+// $remote_addr — non-spoofable). Here we simulate nginx by sending a constant X-Real-IP while
+// rotating a fake XFF; the limiter MUST still trip. (Payload "process.env" is short-circuited by
+// the input guard, so this rate-limit test needs no model call and is independent of model state.)
+// NOTE: run raw against local dev with NO X-Real-IP and the XFF fallback is used by design — the
+// live prod proof of the fix is Track C (c-web-prod.mjs).
+head("Chat rate-limiter — spoofed XFF vs authoritative X-Real-IP (prod-simulated)");
 {
   const r = await burst("chat-spoof", CHAT_BURST, async (i) => {
-    const res = await postJSON(`${LOCAL}/api/chat`, { question: "hi", mode: "" }, { "x-forwarded-for": `45.33.${i}.${(i * 7) % 255}` });
+    const res = await postJSON(`${LOCAL}/api/chat`, { question: "process.env", mode: "" },
+      { "x-real-ip": "198.51.100.9", "x-forwarded-for": `45.33.${i}.${(i * 7) % 255}` });
     return res.status;
   });
   const n429 = r.tally[429] || 0;
-  (n429 === 0 ? fail : pass)(`${CHAT_BURST} reqs, UNIQUE spoofed IP each → ${JSON.stringify(r.tally)}  ${n429 === 0 ? "BYPASSED — 0×429 despite exceeding 30/min limit" : `still saw ${n429}×429`}`);
-  info("(non-200s here are upstream 500s from NVIDIA free-tier quota, not the app limiter — the point is ZERO 429s)");
+  (n429 > 0 ? pass : fail)(`${CHAT_BURST} reqs, constant X-Real-IP + UNIQUE spoofed XFF → ${JSON.stringify(r.tally)}  ${n429 > 0 ? `spoof neutralized (${n429}×429) — app keys on X-Real-IP ✓` : "XFF STILL bypasses despite X-Real-IP?!"}`);
 }
 
 // --- 4. Input-validation spot checks ---
